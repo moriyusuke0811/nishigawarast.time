@@ -11,7 +11,7 @@ function showClock() {
     let nowHour = twoDigit( nowTime.getHours() );
     let nowMin  = twoDigit( nowTime.getMinutes() );
     let nowSec  = twoDigit( nowTime.getSeconds() );
-    let msg = "現在時刻：" + nowHour + ":" + nowMin + ":" + nowSec;
+    let msg = "現在時刻" + nowHour + ":" + nowMin + ":" + nowSec;
     document.getElementById("realtime").innerHTML = msg;
 }
 setInterval('showClock()',1000);
