@@ -9,29 +9,25 @@
   <style>
 
   </style>
-  <div >
-     <a class="time"><p>現在時刻<span id="real-time"></span></p></a>
-
-    <script type="text/javascript">
-      function twoDigit(num) {
-        let ret;
-        if( num < 10 ) 
-        ret = "0" + num; 
-        else 
-          ret = num; 
-        return ret;
-      }
-      function Time() {
-        var realTime = new Date();
-        var hour = realTime.getHours();
-        var minutes  = realTime.getMinutes();
-        var seconds  = realTime.getSeconds();
-        var text = hour + ":" + minutes + ":" + seconds;
-        document.getElementById("real-time").innerHTML = text;
-      }
-      setInterval('Time()',1000);
-    </script>
-  </div>
+  <script>
+    function twoDigit(num) {
+      let ret;
+      if( num < 10 ) 
+	    ret = "0" + num; 
+      else 
+   	    ret = num; 
+      return ret;
+    }
+    function showClock() {
+      let nowTime = new Date();
+      let nowHour = twoDigit( nowTime.getHours() );
+      let nowMin  = twoDigit( nowTime.getMinutes() );
+      let nowSec  = twoDigit( nowTime.getSeconds() );
+      let msg = "現在時刻：" + nowHour + ":" + nowMin + ":" + nowSec;
+      document.getElementById("realtime").innerHTML = msg;
+    }
+    setInterval('showClock()',1000);
+  </script>
 
 </body>
 
