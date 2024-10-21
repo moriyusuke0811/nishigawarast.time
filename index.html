@@ -12,17 +12,25 @@
   <div id="time">
      <p>現在時刻<span id="real-time"></span></p>
 
-  <script type="text/javascript">
-function Time() {
-   var realTime = new Date();
-   var hour = realTime.getHours();
-   var minutes  = realTime.getMinutes();
-   var seconds  = realTime.getSeconds();
-   var text = hour + ":" + minutes + ":" + seconds;
-   document.getElementById("real-time").innerHTML = text;
-}
-setInterval('Time()',1000);
-  </script>
+    <script type="text/javascript">
+      function twoDigit(num) {
+        let ret;
+        if( num < 10 ) 
+        ret = "0" + num; 
+        else 
+          ret = num; 
+        return ret;
+      }
+      function Time() {
+        var realTime = new Date();
+        var hour = realTime.getHours();
+        var minutes  = realTime.getMinutes();
+        var seconds  = realTime.getSeconds();
+        var text = hour + ":" + minutes + ":" + seconds;
+        document.getElementById("real-time").innerHTML = text;
+      }
+      setInterval('Time()',1000);
+    </script>
   </div>
 
 </body>
