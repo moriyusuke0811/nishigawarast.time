@@ -10,30 +10,20 @@
 
   </style>
   <div id="time">
-    <script>
-      function twoDigit(num) {
-        let ret;
-        if( num < 10 ) 
-          ret = "0" + num; 
-        else 
-          ret = num; 
-        return ret;
-      }
-      function showClock() {
-          let nowTime = new Date();
-          let nowHour = twoDigit( nowTime.getHours() );
-          let nowMin  = twoDigit( nowTime.getMinutes() );
-          let nowSec  = twoDigit( nowTime.getSeconds() );
-          let msg = "現在時刻" + nowHour + ":" + nowMin + ":" + nowSec;
-          document.getElementById("realtime").innerHTML = msg;
-      }
-      setInterval('showClock()',2000);
-    </script>
-  </diva>
+     <p>現在時刻は<span id="real-time"></span>です</p>
 
-
-
-  <p id="realtime"></p>
+  <script type="text/javascript">
+function Time() {
+   var realTime = new Date();
+   var hour = realTime.getHours();
+   var minutes  = realTime.getMinutes();
+   var seconds  = realTime.getSeconds();
+   var text = hour + ":" + minutes + ":" + seconds;
+   document.getElementById("real-time").innerHTML = text;
+}
+setInterval('Time()',1000);
+  </script>
+  </div>
 
 </body>
 
