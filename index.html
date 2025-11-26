@@ -1,39 +1,129 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
 <head>
-  <meta charset="utf-8" />
-  <title>niigwr</title>
-  <style>
-
-  </style>
-  <a class="time">
-    <script>
-      function twoDigit(num) {
-        let ret;
-        if( num < 10 ) 
-        ret = "0" + num; 
-        else 
-          ret = num; 
-        return ret;
-      }
-      function showClock() {
-        let nowTime = new Date();
-        let nowHour = twoDigit( nowTime.getHours() );
-        let nowMin  = twoDigit( nowTime.getMinutes() );
-        let nowSec  = twoDigit( nowTime.getSeconds() );
-        let msg = "現在時刻：" + nowHour + ":" + nowMin + ":" + nowSec;
-        document.getElementById("realtime").innerHTML = msg;
-      }
-      setInterval('showClock()',1000);
-    </script>
-  </a>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>学校発 次の便</title>
+<style>
+  body{font-family:system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP"; background:#0d1117; color:#e6edf3; padding:18px}
+  .big { font-size:48px; font-weight:700; margin:10px 0; text-align:center; }
+  .card{background:#101318;padding:16px;border-radius:12px;margin-bottom:12px}
+  .ok{color:#8be78b} .warn{color:#ffc86b} .bad{color:#ff6b6b}
+</style>
 </head>
-
 <body>
+<h2>学校 → 次に乗れる便（西川原就実 / 中央警察署前 / 浜本町）</h2>
+<div id="now"></div>
 
-  <p id="realtime"></p>
+<div class="card">
+  <div>あなたの歩行パターン（自動判定なし）</div>
+  <div>急ぐ: <b>10分</b> / 普通: <b>14分</b> / ゆっくり: <b>17分</b></div>
+</div>
 
+<div id="leaveBig" class="big"></div>
+
+<div id="results"></div>
+
+<script>
+const WALK_OPTIONS = {
+  schoolToNishigawara: {fast:10, normal:14, slow:17},
+  schoolToChuoKeisatsu: {normal:8},
+  schoolToHamamoto: {normal:12}
+};
+
+function minsToStr(m){
+  if (m<=0) return "今すぐ出発";
+  if (m<60) return `${m}分`;
+  const h = Math.floor(m/60);
+  const mm = m%60;
+  return `${h}時間${mm}分`;
+}
+
+async function fetchAll(){
+  const [jr, uno, ok] = await Promise.all([
+    fetch("/api/jr").then(r=>r.json()).catch(()=>null),
+    fetch("/api/uno").then(r=>r.json()).catch(()=>null),
+    fetch("/api/okaden/hamamoto").then(r=>r.json()).catch(()=>null)
+  ]);
+  return { jr, uno, ok };
+}
+
+function nowMinutes(){ const d=new Date(); return d.getHours()*60 + d.getMinutes(); }
+
+function nextN(timetable, nowMin, filterDestFn){
+  // timetable: [{time:"HH:MM", dest:"..."}]
+  if(!timetable) return [];
+  const future = timetable
+    .map(r => ({...r, minutes: (() => { const [h,m]=r.time.split(":").map(Number); return h*60+m; })()}))
+    .filter(r => r.minutes >= nowMin)
+    .filter(r => !filterDestFn || filterDestFn(r));
+  return future.slice(0,3);
+}
+
+function renderMain(data){
+  const now = new Date();
+  document.getElementById("now").textContent = "現在時刻：" + now.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+
+  const nm = nowMinutes();
+  const out = [];
+
+  // JR: consider direction / 行先が「岡山」より先へ行くか判定（例）
+  const jrNext = data.jr && data.jr.timetable ? nextN(data.jr.timetable, nm, null) : [];
+  out.push(`<div class="card"><strong>🚆 西川原就実（JR）</strong><br>` +
+    (jrNext.length ? jrNext.map(r=>`${r.time} → ${r.dest || "行先不明"}`).join("<br>") : "本日の運行は終了/取得不可") +
+    `<br><small>遅延情報: ${data.jr && data.jr.traffic ? '<span class="warn">あり</span>' : '<span class="ok">なし</span>'}</small></div>`
+  );
+
+  // UNO（岡山中央警察署前）
+  const unoNext = data.uno && data.uno.timetable ? nextN(data.uno.timetable, nm, null) : [];
+  out.push(`<div class="card"><strong>🚌 宇野自動車（中央警察署前）</strong><br>` +
+    (unoNext.length ? unoNext.map(r=>`${r.time} → ${r.dest || "行先"}`).join("<br>") : "取得不可") +
+    `</div>`);
+
+  // OKADEN 浜本町
+  const okNext = data.ok && data.ok.timetable ? nextN(data.ok.timetable, nm, null) : [];
+  out.push(`<div class="card"><strong>🚌 岡電（浜本町）</strong><br>` +
+    (okNext.length ? okNext.map(r=>`${r.time} → ${r.dest || "行先"}`).join("<br>") : "取得不可") +
+    `</div>`);
+
+  document.getElementById("results").innerHTML = out.join("");
+
+  // 大きな「今すぐ出るべきか」インジケータ（最も近い便を基準に）
+  // 学校→駅(西川原)は3モードあるので「急ぐ/普通/ゆっくり」で判定
+  let nearestMinute = Infinity;
+  [jrNext[0], unoNext[0], okNext[0]].forEach(x => { if(x && x.minutes !== undefined) nearestMinute = Math.min(nearestMinute, x.minutes - nm); });
+
+  if (nearestMinute === Infinity) {
+    document.getElementById("leaveBig").textContent = "次の便情報がありません";
+    return;
+  }
+
+  // compare with fast/normal/slow to produce message
+  const walkFast = WALK_OPTIONS.schoolToNishigawara.fast;
+  const walkNormal = WALK_OPTIONS.schoolToNishigawara.normal;
+  const walkSlow = WALK_OPTIONS.schoolToNishigawara.slow;
+
+  const remain = nearestMinute;
+  let msg = "";
+  if (remain < walkFast) {
+    msg = `出発まで ${remain}分 — 今すぐ出ないと間に合いません！`;
+    document.getElementById("leaveBig").className = "big bad";
+  } else if (remain < walkNormal) {
+    msg = `出発まで ${remain}分 — 急げば間に合います！`;
+    document.getElementById("leaveBig").className = "big warn";
+  } else {
+    msg = `出発まで ${remain}分 — 間に合います。`;
+    document.getElementById("leaveBig").className = "big ok";
+  }
+  document.getElementById("leaveBig").textContent = msg;
+}
+
+async function loop(){
+  const data = await fetchAll();
+  renderMain(data);
+}
+loop();
+setInterval(loop, 30000);
+</script>
 </body>
-
 </html>
