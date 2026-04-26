@@ -10,7 +10,7 @@
 :root {
   --sozanblue:#171D55;
   --darkblue:    #030312;
-  --surf:    #141f50; /* 補完 */
+  --surf:    #141f50;
   --surf2:   #141f50;
   --card:    #202439;
   --bdr:     #2a3a7a;
@@ -103,6 +103,7 @@ html, body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  background: var(--surf);
   padding: 10px;
   border-radius: var(--r);
 }
@@ -116,7 +117,7 @@ html, body {
   flex-direction: column;
   gap: 5px;
   min-height: 0;
-  border: 3px solid #fff;
+  border: 1px solid #fff;
 }
 .r-head {
   display:flex; align-items:center; gap:8px;
@@ -182,7 +183,7 @@ html, body {
 .op-block {
   flex:1; min-height:0;
   background: var(--card);
-  border: 3px solid #fff;
+  border: 1px solid var(--bdr);
   border-radius: var(--r);
   padding: 10px;
   display: flex; flex-direction: column;
@@ -190,7 +191,7 @@ html, body {
 .op-dirs   { display:grid; grid-template-columns:1fr 1fr; gap:8px; flex:1; min-height:0;color: #fff; }
 .op-dir    { display:flex; flex-direction:column; gap:4px; min-height:0; }
 .op-dir-hd {
-  font-size:.85rem; font-weight:700; color:#fff;
+  font-size:.85rem; font-weight:700; color:var(--muted);
   border-bottom:1px solid var(--bdr);
   padding-bottom:4px; margin-bottom:2px; flex-shrink:0;
 }
@@ -364,16 +365,18 @@ const TRAIN_LINES = [
   {
     id:'sanyo-up', badge:'S', bg:'#C1D612', name:'山陽線上り', def:'東岡山・瀬戸方面',
     times:[
-      '07:10','07:22','07:35','07:48','08:02','08:15','08:28',
-      '08:41','08:55','09:08','09:22','09:35','09:50','10:04',
-      '10:18','10:32','10:46','11:00','11:14','11:28','11:42',
-      '11:56','12:10','12:24','12:38','12:52','13:06','13:20',
-      '13:34','13:48','14:02','14:16','14:30','14:44','14:58',
-      '15:12','15:26','15:40','15:54','16:08','16:22','16:36',
-      '16:50','17:04','17:18','17:32','17:46','18:00','18:14',
-      '18:28','18:42','18:56','19:10','19:24','19:38','19:52',
-      '20:06','20:20','20:34','20:48','21:02','21:20','21:40',
-      '22:00','22:20','22:40'
+      {time:'06:18',dest:'姫路'}, {time:'06:34',dest:'吉永'}, {time:'07:11',dest:'姫路'},
+      {time:'07:47',dest:'相生'}, {time:'08:13',dest:'相生'}, {time:'08:22',dest:'和気'},
+      {time:'09:22',dest:'相生'}, {time:'09:37',dest:'瀬戸'}, {time:'10:16',dest:'相生'},
+      {time:'10:51',dest:'瀬戸'}, {time:'11:16',dest:'相生'}, {time:'11:46',dest:'瀬戸'},
+      {time:'12:17',dest:'相生'}, {time:'12:58',dest:'瀬戸'}, {time:'13:14',dest:'相生'},
+      {time:'13:45',dest:'瀬戸'}, {time:'14:15',dest:'相生'}, {time:'14:48',dest:'和気'},
+      {time:'15:14',dest:'相生'}, {time:'15:45',dest:'相生'}, {time:'16:16',dest:'相生'},
+      {time:'16:48',dest:'姫路'}, {time:'17:13',dest:'姫路'}, {time:'17:39',dest:'吉永'},
+      {time:'18:07',dest:'姫路'}, {time:'18:36',dest:'三石'}, {time:'19:02',dest:'和気'},
+      {time:'19:20',dest:'姫路'}, {time:'20:02',dest:'姫路'}, {time:'20:32',dest:'姫路'},
+      {time:'20:53',dest:'瀬戸'}, {time:'21:13',dest:'姫路'}, {time:'21:53',dest:'姫路'},
+      {time:'22:28',dest:'三石'}, {time:'23:04',dest:'三石'}
     ]
   }
 ];
