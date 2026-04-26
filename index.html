@@ -9,24 +9,26 @@
    CSS カスタムプロパティ（テーマ変数）
    ============================================================ */
 :root {
-  --bg:        #0a0e1a;
-  --surface:   #111827;
-  --surface2:  #1a2236;
-  --border:    #1e3a5f;
-  --text:      #e8f0fe;
-  --muted:     #7b8db0;
-  --accent:    #38bdf8;
-  --train:     #34d399;
-  --bus:       #fb923c;
+  --bg-main:   #050505;
+  --bg-panel:  #111111;
+  --bg-header: #1a1a1a;
+  --border:    #2a2a2a;
+  
+  --text-main: #ffffff;
+  --text-sub:  #a1a1aa;
+  --accent:    #00f0ff; /* サイバーなシアン */
   
   /* ステータスカラー */
-  --ok:        #4ade80; /* 緑：余裕あり */
-  --hurry:     #facc15; /* 黄：急げばOK */
-  --danger:    #f87171; /* 赤：厳しい */
-  --gone:      #6b7280; /* 灰：発車済 */
+  --ok-text:     #4ade80;
+  --ok-bg:       rgba(74, 222, 128, 0.15);
+  --hurry-text:  #facc15;
+  --hurry-bg:    rgba(250, 204, 21, 0.15);
+  --tight-text:  #f87171;
+  --tight-bg:    rgba(248, 113, 113, 0.15);
+  --gone-text:   #71717a;
+  --gone-bg:     rgba(113, 113, 122, 0.15);
 
-  --font-display: 'Noto Sans JP', sans-serif;
-  --r: 10px;
+  --font-main: 'Noto Sans JP', sans-serif;
 }
 
 /* ============================================================
@@ -37,11 +39,9 @@
 html, body {
   width: 100%; height: 100%;
   overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-display);
-  font-size: 16px;
-  line-height: 1.3;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -51,382 +51,226 @@ html, body {
    全体レイアウト
    ============================================================ */
 #app {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  padding: 12px 16px;
-  gap: 10px;
+  padding: 24px 32px;
+  gap: 24px;
 }
 
 /* ============================================================
    ヘッダー
    ============================================================ */
-#header {
+header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-}
-
-.header-title {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.header-title .icon {
-  font-size: 2rem;
-  line-height: 1;
-}
-.header-title h1 {
-  font-size: 1.5rem;
-  font-weight: 900;
-  letter-spacing: 0.03em;
-  color: var(--text);
-}
-.header-title .sub {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-.header-right {
-  display: flex;
-  flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
-}
-#clock {
-  font-size: 2.8rem;
-  font-weight: 900;
-  color: var(--accent);
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
-}
-#date-display {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-#update-badge {
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-/* ============================================================
-   メインコンテンツ（電車 + バス）
-   ============================================================ */
-#main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  min-height: 0;
-}
-
-.section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 16px;
   flex-shrink: 0;
 }
-.section-header .section-icon {
-  font-size: 1.4rem;
+
+.title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-.section-header h2 {
-  font-size: 1.15rem;
-  font-weight: 700;
+.title-en {
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+}
+.title-ja {
+  font-size: 2rem;
+  font-weight: 900;
   letter-spacing: 0.05em;
 }
-.section-header .section-subtitle {
-  font-size: 0.78rem;
-  color: var(--muted);
-  margin-left: auto;
-}
 
-.section-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 10px;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* 左右分割用 */
-.group-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  flex: 1;
-}
-
-.direction-group {
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.direction-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0.08em;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 6px;
-  margin-bottom: 2px;
-}
-
-/* ============================================================
-   カード（個別路線・バス系統）
-   ============================================================ */
-.card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-height: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 4px;
-  border-radius: 8px 0 0 8px;
-}
-.train-card::before { background: var(--train); }
-.bus-card::before   { background: var(--bus); }
-
-.card-route {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.train-card .card-route { color: #6ee7b7; }
-.bus-card  .card-route  { color: #fdba74; }
-
-/* 2段表示用リストレイアウト */
-.departures-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.departure-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(0,0,0,0.2);
-  border-radius: 6px;
-  padding: 6px 10px;
-}
-
-/* 1本目は少し大きく、2本目は少し小さく */
-.departure-item:first-child {
-  padding: 8px 10px;
-}
-.departure-item:last-child {
-  opacity: 0.85;
-}
-
-.dep-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.card-dest {
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: var(--text);
-  white-space: nowrap;
-}
-.departure-item:first-child .card-dest {
-  font-size: 1.25rem;
-}
-
-.card-time {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-
-.dep-status-col {
+.time-group {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
 }
-
-.card-countdown {
-  font-size: 1.6rem;
+#clock {
+  font-size: 4rem;
   font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
   font-variant-numeric: tabular-nums;
-  min-width: 4.5ch;
-  text-align: right;
+  letter-spacing: 0.05em;
 }
-.departure-item:first-child .card-countdown {
-  font-size: 2rem;
-}
-
-.card-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
+#date-display {
+  font-size: 1.2rem;
+  color: var(--text-sub);
+  margin-top: 8px;
   font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 20px;
-  min-width: 80px;
 }
-.status-ok     { background: rgba(74,222,128,.15); color: var(--ok);     border: 1px solid rgba(74,222,128,.4); }
-.status-hurry  { background: rgba(250,204,21,.15);  color: var(--hurry);  border: 1px solid rgba(250,204,21,.4); }
-.status-tight  { background: rgba(248,113,113,.15); color: var(--danger); border: 1px solid rgba(248,113,113,.4); }
-.status-gone   { background: rgba(107,114,128,.15); color: var(--gone);   border: 1px solid rgba(107,114,128,.4); }
-
-.cd-ok     { color: var(--ok); }
-.cd-hurry  { color: var(--hurry); }
-.cd-tight  { color: var(--danger); }
-.cd-gone   { color: var(--gone); }
 
 /* ============================================================
-   バス用レイアウト
+   メインコンテンツ（2x2グリッド）
    ============================================================ */
-.bus-operator-name {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--bus);
-  letter-spacing: 0.08em;
-  margin-bottom: 2px;
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
 }
-.bus-operator-stop {
-  font-size: 0.7rem;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-.bus-routes {
+
+/* パネル（各方面の枠） */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  overflow: hidden;
 }
 
-/* ============================================================
-   フッター (判例)
-   ============================================================ */
-#footer {
+.panel-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  font-size: 0.8rem;
-  color: var(--muted);
-  flex-shrink: 0;
+  align-items: center;
+  background: var(--bg-header);
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
 }
-.footer-note {
+.panel-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+.panel-walk {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  background: rgba(255,255,255,0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* リスト部分 */
+.list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.row {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex: 1; /* 均等に高さを分配 */
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+.row:last-child {
+  border-bottom: none;
+}
+.row.empty {
+  justify-content: center;
+  color: var(--text-sub);
+  font-size: 1.2rem;
   font-weight: 700;
 }
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+
+/* 行の各要素 */
+.col-time {
+  width: 130px;
+  font-size: 2.8rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
 }
-.legend-dot {
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  display: inline-block;
+.col-dest {
+  flex: 1;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.col-min {
+  width: 120px;
+  text-align: right;
+  font-size: 2.8rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  padding-right: 20px;
+}
+.col-status {
+  width: 160px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 900;
+  padding: 12px 0;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
 }
 
-@keyframes blink {
-  0%,100% { opacity: 1; }
-  50%      { opacity: 0.4; }
-}
+/* ステータスバリエーション */
+.st-ok    { background: var(--ok-bg);    color: var(--ok-text);    border: 1px solid rgba(74,222,128,0.3); }
+.st-hurry { background: var(--hurry-bg); color: var(--hurry-text); border: 1px solid rgba(250,204,21,0.3); }
+.st-tight { background: var(--tight-bg); color: var(--tight-text); border: 1px solid rgba(248,113,113,0.3); }
+.st-gone  { background: var(--gone-bg);  color: var(--gone-text);  border: 1px solid rgba(113,113,122,0.3); }
+
+.cd-ok    { color: var(--ok-text); }
+.cd-hurry { color: var(--hurry-text); }
+.cd-tight { color: var(--tight-text); }
+.cd-gone  { color: var(--gone-text); }
+
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 .blink { animation: blink 1s ease-in-out infinite; }
-
 </style>
 </head>
 <body>
 
 <div id="app">
-  <header id="header">
-    <div class="header-title">
-      <span class="icon">🚉</span>
-      <div>
-        <h1>交通案内</h1>
-        <div class="sub">岡山操山高校 文化祭 ／ 最寄り駅：西川原・就実駅</div>
-      </div>
+  <header>
+    <div class="title-group">
+      <div class="title-en">SOZAN TRAIN & BUS TRANSIT</div>
+      <div class="title-ja">岡山操山高校 文化祭 交通案内</div>
     </div>
-    <div class="header-right">
+    <div class="time-group">
       <div id="clock">--:--:--</div>
-      <div id="date-display"></div>
-      <div id="update-badge">🔄 自動更新中</div>
+      <div id="date-display">----年--月--日</div>
     </div>
   </header>
 
-  <main id="main">
-    <section class="section" id="train-section">
-      <div class="section-header">
-        <span class="section-icon">🚃</span>
-        <h2>電車（JR西川原・就実駅）</h2>
-        <span class="section-subtitle">🚶 徒歩：通常 12分 ／ 急いで 8分</span>
+  <main>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🚃 電車 - 岡山方面</div>
+        <div class="panel-walk">駅まで徒歩約5分</div>
       </div>
-      <div class="section-body group-grid" id="train-cards">
-        </div>
-    </section>
-
-    <section class="section" id="bus-section">
-      <div class="section-header">
-        <span class="section-icon">🚌</span>
-        <h2>バス</h2>
-        <span class="section-subtitle">🚶 徒歩：通常 5分 ／ 急いで 3分</span>
-      </div>
-      <div class="section-body group-grid" id="bus-body">
-        </div>
-    </section>
-  </main>
-
-  <footer id="footer">
-    <div class="footer-note">
-      <span style="color:var(--text); margin-right: 10px;">【色の見方】</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span>緑：余裕あり（12分以上）</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--hurry)"></span>黄：急げば間に合う（8〜11分）</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>赤：厳しい・間に合わない（8分未満）</span>
+      <div class="list" id="list-train-west"></div>
     </div>
-    <span style="font-weight:normal;">※表示は参考用です</span>
-  </footer>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🚃 電車 - 東岡山方面</div>
+        <div class="panel-walk">駅まで徒歩約5分</div>
+      </div>
+      <div class="list" id="list-train-east"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🚌 バス - 宇野バス（中央警察署前）</div>
+        <div class="panel-walk">バス停まで徒歩約5分</div>
+      </div>
+      <div class="list" id="list-bus-uno"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🚌 バス - 岡電バス（浜本町）</div>
+        <div class="panel-walk">バス停まで徒歩約4分</div>
+      </div>
+      <div class="list" id="list-bus-okaden"></div>
+    </div>
+  </main>
 </div>
 
 <script>
@@ -434,172 +278,97 @@ html, body {
    データ定義
    ============================================================ */
 
-// 徒歩時間定義（通常, 急ぎ）
 const WALK_MINUTES = {
-  train: { normal: 12, hurry: 8 },  // 学校→駅
-  bus:   { normal: 5,  hurry: 3 }   // 学校→バス停（目安として統一）
+  train:   5, // 西川原・就実駅
+  uno:     5, // 中央警察署前
+  okaden:  4  // 浜本町
 };
 
-/* --- 電車 時刻表（左右グループ分割） --- */
-const TRAIN_GROUPS = [
-  {
-    id: 'westbound',
-    name: '◀ 岡山 方面',
+// 方面別に複数路線のデータを束ねる
+const TRANSIT_DATA = {
+  'train-west': {
+    walk: WALK_MINUTES.train,
     lines: [
       {
-        id: 'hakubi',
-        label: '伯備線方面',
-        dest: '総社・新見方面',
-        times: [
-          { time: '07:19', dest: '新見' }, { time: '09:04', dest: '新見' }, { time: '11:12', dest: '新見' },
-          { time: '12:12', dest: '新見' }, { time: '12:57', dest: '備中高梁' }, { time: '13:27', dest: '備中高梁' },
-          { time: '14:31', dest: '備中高梁' }, { time: '15:59', dest: '新見' }, { time: '16:27', dest: '備中高梁' },
-          { time: '17:36', dest: '新見' }, { time: '18:35', dest: '新見' }, { time: '18:58', dest: '備中高梁' },
-          { time: '20:14', dest: '備中高梁' }, { time: '21:04', dest: '新見' }
-        ]
+        dest: '新見・備中高梁',
+        times: ['07:19','09:04','11:12','12:12','12:57','13:27','14:31','15:59','16:27','17:36','18:35','18:58','20:14','21:04']
       },
       {
-        id: 'sanyo-down',
-        label: '山陽線 下り',
         dest: '岡山・福山方面',
         times: [
-          { time: '05:48', dest: '岡山' }, { time: '06:06', dest: '糸崎' }, { time: '06:29', dest: '岡山' },
-          { time: '06:48', dest: '岡山' }, { time: '07:07', dest: '三原' }, { time: '07:44', dest: '岡山' },
-          { time: '07:50', dest: '福山' }, { time: '07:58', dest: '岡山' }, { time: '08:25', dest: '岡山' },
-          { time: '08:31', dest: '三原' }, { time: '08:36', dest: '岡山' }, { time: '08:50', dest: '岡山' },
-          { time: '09:25', dest: '岡山' }, { time: '09:34', dest: '岡山' }, { time: '09:40', dest: '岡山' },
-          { time: '10:03', dest: '福山' }, { time: '10:26', dest: '岡山' }, { time: '10:34', dest: '岡山' },
-          { time: '10:51', dest: '三原' }, { time: '11:29', dest: '岡山' }, { time: '11:34', dest: '三原' },
-          { time: '11:59', dest: '福山' }, { time: '12:26', dest: '岡山' }, { time: '12:35', dest: '岡山' },
-          { time: '13:02', dest: '岡山' }, { time: '13:33', dest: '岡山' }, { time: '13:52', dest: '金光' },
-          { time: '13:57', dest: '岡山' }, { time: '14:35', dest: '岡山' }, { time: '14:58', dest: '糸崎' },
-          { time: '15:05', dest: '岡山' }, { time: '15:27', dest: '三原' }, { time: '15:32', dest: '岡山' },
-          { time: '15:54', dest: '府中' }, { time: '16:33', dest: '岡山' }, { time: '16:52', dest: '岡山' },
-          { time: '16:59', dest: '岡山' }, { time: '17:25', dest: '岡山' }, { time: '18:00', dest: '岡山' },
-          { time: '18:04', dest: '糸崎' }, { time: '18:23', dest: '岡山' }, { time: '18:51', dest: '岡山' },
-          { time: '19:16', dest: '糸崎' }, { time: '19:34', dest: '糸崎' }, { time: '19:44', dest: '岡山' },
-          { time: '19:54', dest: '糸崎' }, { time: '20:06', dest: '岡山' }, { time: '20:27', dest: '岡山' },
-          { time: '20:32', dest: '岡山' }, { time: '21:10', dest: '岡山' }, { time: '21:34', dest: '岡山' },
-          { time: '21:41', dest: '岡山' }, { time: '21:57', dest: '岡山' }, { time: '22:02', dest: '岡山' },
-          { time: '22:38', dest: '岡山' }, { time: '23:05', dest: '岡山' }, { time: '23:26', dest: '岡山' }
+          '05:48','06:06','06:29','06:48','07:07','07:44','07:50','07:58','08:25','08:31','08:36','08:50',
+          '09:25','09:34','09:40','10:03','10:26','10:34','10:51','11:29','11:34','11:59','12:26','12:35',
+          '13:02','13:33','13:52','13:57','14:35','14:58','15:05','15:27','15:32','15:54','16:33','16:52',
+          '16:59','17:25','18:00','18:04','18:23','18:51','19:16','19:34','19:44','19:54','20:06','20:27',
+          '20:32','21:10','21:34','21:41','21:57','22:02','22:38','23:05','23:26'
         ]
       }
     ]
   },
-  {
-    id: 'eastbound',
-    name: '東岡山 方面 ▶',
+  'train-east': {
+    walk: WALK_MINUTES.train,
     lines: [
       {
-        id: 'sanyo-up',
-        label: '山陽線 上り',
-        dest: '東岡山・瀬戸方面',
+        dest: '東岡山・瀬戸',
         times: [
-          '07:10','07:22','07:35','07:48','08:02','08:15','08:28',
-          '08:41','08:55','09:08','09:22','09:35','09:50','10:04',
-          '10:18','10:32','10:46','11:00','11:14','11:28','11:42',
-          '11:56','12:10','12:24','12:38','12:52','13:06','13:20',
-          '13:34','13:48','14:02','14:16','14:30','14:44','14:58',
-          '15:12','15:26','15:40','15:54','16:08','16:22','16:36',
-          '16:50','17:04','17:18','17:32','17:46','18:00','18:14',
-          '18:28','18:42','18:56','19:10','19:24','19:38','19:52',
-          '20:06','20:20','20:34','20:48','21:02','21:20','21:40',
-          '22:00','22:20','22:40'
+          '07:10','07:22','07:35','07:48','08:02','08:15','08:28','08:41','08:55','09:08','09:22','09:35',
+          '09:50','10:04','10:18','10:32','10:46','11:00','11:14','11:28','11:42','11:56','12:10','12:24',
+          '12:38','12:52','13:06','13:20','13:34','13:48','14:02','14:16','14:30','14:44','14:58','15:12',
+          '15:26','15:40','15:54','16:08','16:22','16:36','16:50','17:04','17:18','17:32','17:46','18:00',
+          '18:14','18:28','18:42','18:56','19:10','19:24','19:38','19:52','20:06','20:20','20:34','20:48',
+          '21:02','21:20','21:40','22:00','22:20','22:40'
         ]
       },
       {
-        id: 'ako',
-        label: '赤穂線方面',
-        dest: '東岡山・播州赤穂方面',
+        dest: '西大寺・播州赤穂', // 赤穂線は行き先が細かいので大枠を表示
         times: [
-          { time: '05:17', dest: '播州赤穂' }, { time: '05:59', dest: '播州赤穂' }, { time: '06:25', dest: '播州赤穂' },
-          { time: '07:30', dest: '播州赤穂' }, { time: '07:42', dest: '西大寺' }, { time: '07:55', dest: '長船' },
-          { time: '08:28', dest: '播州赤穂' }, { time: '08:35', dest: '播州赤穂' }, { time: '08:53', dest: '長船' },
-          { time: '10:11', dest: '長船' }, { time: '10:59', dest: '播州赤穂' }, { time: '11:27', dest: '西大寺' },
-          { time: '11:57', dest: '長船' }, { time: '12:27', dest: '播州赤穂' }, { time: '12:44', dest: '西大寺' },
-          { time: '13:26', dest: '長船' }, { time: '13:58', dest: '播州赤穂' }, { time: '14:25', dest: '備前片上' },
-          { time: '14:43', dest: '西大寺' }, { time: '15:00', dest: '播州赤穂' }, { time: '15:28', dest: '長船' },
-          { time: '15:58', dest: '播州赤穂' }, { time: '16:21', dest: '長船' }, { time: '16:38', dest: '播州赤穂' },
-          { time: '17:02', dest: '備前片上' }, { time: '17:30', dest: '播州赤穂' }, { time: '17:53', dest: '備前片上' },
-          { time: '18:20', dest: '播州赤穂' }, { time: '18:44', dest: '長船' }, { time: '19:15', dest: '播州赤穂' },
-          { time: '19:37', dest: '備前片上' }, { time: '20:08', dest: '播州赤穂' }, { time: '20:44', dest: '日生' },
-          { time: '21:26', dest: '播州赤穂' }, { time: '22:08', dest: '長船' }, { time: '23:15', dest: '備前片上' }
-        ]
-      }
-    ]
-  }
-];
-
-/* --- バス 時刻表 --- */
-const BUS_OPERATORS = [
-  {
-    id: 'uno',
-    name: '宇野自動車',
-    stop: 'バス停：中央警察署前',
-    walkMinutes: WALK_MINUTES.bus,
-    routes: [
-      {
-        id: 'uno-hyogo',
-        dest: '表町方面',
-        times: [
-          '07:15','07:35','07:55','08:15','08:35','08:55',
-          '09:15','09:35','09:55','10:15','10:35','10:55',
-          '11:15','11:35','11:55','12:15','12:35','12:55',
-          '13:15','13:35','13:55','14:15','14:35','14:55',
-          '15:15','15:35','15:55','16:15','16:35','16:55',
-          '17:15','17:35','17:55','18:15','18:35','18:55',
-          '19:15','19:45','20:15','20:45','21:15','21:45'
-        ]
-      },
-      {
-        id: 'uno-higashi',
-        dest: '東岡山方面',
-        times: [
-          '07:20','07:50','08:20','08:50','09:20','09:50',
-          '10:20','10:50','11:20','11:50','12:20','12:50',
-          '13:20','13:50','14:20','14:50','15:20','15:50',
-          '16:20','16:50','17:20','17:50','18:20','18:50',
-          '19:20','19:50','20:30','21:10','21:50'
+          '05:17','05:59','06:25','07:30','07:42','07:55','08:28','08:35','08:53','10:11','10:59','11:27',
+          '11:57','12:27','12:44','13:26','13:58','14:25','14:43','15:00','15:28','15:58','16:21','16:38',
+          '17:02','17:30','17:53','18:20','18:44','19:15','19:37','20:08','20:44','21:26','22:08','23:15'
         ]
       }
     ]
   },
-  {
-    id: 'kdenkibus',
-    name: '岡山電気軌道バス',
-    stop: 'バス停：浜本町',
-    walkMinutes: WALK_MINUTES.bus,
-    routes: [
+  'bus-uno': {
+    walk: WALK_MINUTES.uno,
+    lines: [
       {
-        id: 'kdenkibus-okayama',
-        dest: '岡山駅方面',
-        times: [
-          '07:05','07:25','07:45','08:05','08:25','08:45',
-          '09:05','09:25','09:45','10:05','10:25','10:45',
-          '11:05','11:25','11:45','12:05','12:25','12:45',
-          '13:05','13:25','13:45','14:05','14:25','14:45',
-          '15:05','15:25','15:45','16:05','16:25','16:45',
-          '17:05','17:25','17:45','18:05','18:25','18:45',
-          '19:05','19:30','20:00','20:30','21:00','21:40'
-        ]
+        dest: '表町方面',
+        times: ['07:15','07:35','07:55','08:15','08:35','08:55','09:15','09:35','09:55','10:15','10:35','10:55',
+                '11:15','11:35','11:55','12:15','12:35','12:55','13:15','13:35','13:55','14:15','14:35','14:55',
+                '15:15','15:35','15:55','16:15','16:35','16:55','17:15','17:35','17:55','18:15','18:35','18:55',
+                '19:15','19:45','20:15','20:45','21:15','21:45']
       },
       {
-        id: 'kdenkibus-fujiwara',
+        dest: '東岡山方面',
+        times: ['07:20','07:50','08:20','08:50','09:20','09:50','10:20','10:50','11:20','11:50','12:20','12:50',
+                '13:20','13:50','14:20','14:50','15:20','15:50','16:20','16:50','17:20','17:50','18:20','18:50',
+                '19:20','19:50','20:30','21:10','21:50']
+      }
+    ]
+  },
+  'bus-okaden': {
+    walk: WALK_MINUTES.okaden,
+    lines: [
+      {
+        dest: '岡山駅方面',
+        times: ['07:05','07:25','07:45','08:05','08:25','08:45','09:05','09:25','09:45','10:05','10:25','10:45',
+                '11:05','11:25','11:45','12:05','12:25','12:45','13:05','13:25','13:45','14:05','14:25','14:45',
+                '15:05','15:25','15:45','16:05','16:25','16:45','17:05','17:25','17:45','18:05','18:25','18:45',
+                '19:05','19:30','20:00','20:30','21:00','21:40']
+      },
+      {
         dest: '藤原団地方面',
-        times: [
-          '07:30','08:00','08:30','09:00','09:30','10:00',
-          '10:30','11:00','11:30','12:00','12:30','13:00',
-          '13:30','14:00','14:30','15:00','15:30','16:00',
-          '16:30','17:00','17:30','18:00','18:30','19:00',
-          '19:40','20:20','21:00','21:40'
-        ]
+        times: ['07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00',
+                '13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00',
+                '19:40','20:20','21:00','21:40']
       }
     ]
   }
-];
+};
 
 /* ============================================================
-   ユーティリティ関数
+   ユーティリティ
    ============================================================ */
 
 function now() { return new Date(); }
@@ -615,221 +384,112 @@ function minutesUntil(hhmm) {
   return (toDate(hhmm) - now()) / 60000;
 }
 
-// 指定した件数（count）だけ次の便を取得
-function getNextDepartures(times, count = 2) {
-  const upcoming = times
-    .map(item => {
-      const isStr = typeof item === 'string';
-      const timeStr = isStr ? item : item.time;
-      const destStr = isStr ? null : item.dest;
-      return { time: timeStr, dest: destStr, min: minutesUntil(timeStr) };
-    })
+// 特定のグループ（複数路線）から直近 count 本を抽出
+function getTopDepartures(groupData, count = 3) {
+  let combined = [];
+  groupData.lines.forEach(line => {
+    line.times.forEach(timeStr => {
+      combined.push({
+        time: timeStr,
+        dest: line.dest,
+        min: minutesUntil(timeStr)
+      });
+    });
+  });
+  
+  // 過ぎた時間を除外し、近い順にソートして指定件数を返す
+  return combined
     .filter(t => t.min > -1)
-    .sort((a, b) => a.min - b.min);
-  return upcoming.slice(0, count);
+    .sort((a, b) => a.min - b.min)
+    .slice(0, count);
 }
 
-// 時間に応じた緑・黄・赤のステータス判定
-function getStatus(minutesLeft, normalMin, hurryMin) {
-  if (minutesLeft < 0) return { label: '発車済', cls: 'status-gone',  cdCls: 'cd-gone' };
-  if (minutesLeft >= normalMin) return { label: '余裕あり', cls: 'status-ok',   cdCls: 'cd-ok' }; // 12分以上（緑）
-  if (minutesLeft >= hurryMin)  return { label: '急げばOK', cls: 'status-hurry',cdCls: 'cd-hurry' }; // 8〜11分（黄）
-  return { label: '厳しい', cls: 'status-tight', cdCls: 'cd-tight' }; // 8分未満（赤）
+// 残り時間と徒歩分数から状態を判定
+function getStatus(minutesLeft, walkMin) {
+  const margin = minutesLeft - walkMin;
+  if (margin >= 5) return { label: '余裕あり', cls: 'st-ok',    cdCls: 'cd-ok' };
+  if (margin >= 2) return { label: '急げ！',   cls: 'st-hurry', cdCls: 'cd-hurry' };
+  if (margin >= 0) return { label: '厳しい',   cls: 'st-tight', cdCls: 'cd-tight' };
+  return           { label: '発車済',   cls: 'st-gone',  cdCls: 'cd-gone' };
 }
 
 function fmtMin(min) {
-  if (min < 0) return '発車済';
-  if (min < 1) return '間もなく';
+  if (min < 1) return '0分';
   return `${Math.floor(min)}分`;
 }
 
 /* ============================================================
-   時計 UI 更新
+   UI 更新処理
    ============================================================ */
+
 function updateClock() {
   const n = now();
   const pad = x => String(x).padStart(2,'0');
   document.getElementById('clock').textContent =
     `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
 
-  const week = ['日','月','火','水','木','金','土'];
+  const week = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   document.getElementById('date-display').textContent =
-    `${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日（${week[n.getDay()]}）`;
+    `${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日 (${week[n.getDay()]})`;
 }
 
-/* ============================================================
-   UI 生成（電車・バス）
-   ============================================================ */
+function renderList(containerId, dataKey) {
+  const container = document.getElementById(containerId);
+  const groupData = TRANSIT_DATA[dataKey];
+  const deps = getTopDepartures(groupData, 3);
 
-function generateDepartureItem(dep, defaultDest, walkConfig, idPrefix, index) {
-  const status = getStatus(dep.min, walkConfig.normal, walkConfig.hurry);
-  const blinkCls = dep.min <= walkConfig.hurry && dep.min >= 0 ? 'blink' : '';
-  const displayDest = dep.dest ? `${dep.dest} 行き` : defaultDest;
-
-  return `
-    <div class="departure-item">
-      <div class="dep-main">
-        <div class="card-dest">${displayDest}</div>
-        <div class="card-time">${dep.time}</div>
-      </div>
-      <div class="dep-status-col">
-        <div class="card-countdown ${status.cdCls} ${blinkCls}" id="${idPrefix}-${index}">${fmtMin(dep.min)}</div>
-        <div class="card-status ${status.cls}" id="${idPrefix}-badge-${index}">${status.label}</div>
-      </div>
-    </div>
-  `;
-}
-
-function buildTrainCards() {
-  const container = document.getElementById('train-cards');
   container.innerHTML = '';
 
-  TRAIN_GROUPS.forEach(group => {
-    const groupDiv = document.createElement('div');
-    groupDiv.className = 'direction-group';
+  if (deps.length === 0) {
+    container.innerHTML = `<div class="row empty">本日の運行は終了しました</div>`;
+    return;
+  }
 
-    const title = document.createElement('div');
-    title.className = 'direction-title';
-    title.textContent = group.name;
-    groupDiv.appendChild(title);
+  // 常に3行分レイアウトを作る（足りない分は空行）
+  for (let i = 0; i < 3; i++) {
+    const row = document.createElement('div');
+    row.className = 'row';
 
-    group.lines.forEach(line => {
-      // 2段表示にするために2件取得
-      const nexts = getNextDepartures(line.times, 2);
-      const card = document.createElement('div');
-      card.className = 'card train-card';
-      card.id = `card-${line.id}`;
+    if (i < deps.length) {
+      const dep = deps[i];
+      const st = getStatus(dep.min, groupData.walk);
+      const blink = (dep.min <= 3 && dep.min >= 0) ? 'blink' : '';
 
-      let innerHtml = `<div class="card-route">${line.label}</div>`;
-
-      if (nexts.length === 0) {
-        innerHtml += `<div style="color:var(--muted);font-size:0.9rem;margin-top:8px">本日の運行終了</div>`;
-      } else {
-        innerHtml += `<div class="departures-list">`;
-        nexts.forEach((dep, i) => {
-          innerHtml += generateDepartureItem(dep, line.dest, WALK_MINUTES.train, `cd-train-${line.id}`, i);
-        });
-        innerHtml += `</div>`;
-      }
-      card.innerHTML = innerHtml;
-      groupDiv.appendChild(card);
-    });
-    container.appendChild(groupDiv);
-  });
+      row.innerHTML = `
+        <div class="col-time">${dep.time}</div>
+        <div class="col-dest">${dep.dest}行</div>
+        <div class="col-min ${st.cdCls} ${blink}">${fmtMin(dep.min)}</div>
+        <div class="col-status ${st.cls}">${st.label}</div>
+      `;
+    } else {
+      // 便がない枠
+      row.innerHTML = `
+        <div class="col-time" style="color:var(--border)">--:--</div>
+        <div class="col-dest"></div>
+        <div class="col-min"></div>
+        <div class="col-status"></div>
+      `;
+    }
+    container.appendChild(row);
+  }
 }
 
-function buildBusCards() {
-  const body = document.getElementById('bus-body');
-  body.innerHTML = '';
-
-  BUS_OPERATORS.forEach(op => {
-    const opDiv = document.createElement('div');
-    opDiv.className = 'direction-group';
-
-    const title = document.createElement('div');
-    title.className = 'bus-operator-name';
-    title.innerHTML = `🚌 ${op.name}`;
-    
-    const stop = document.createElement('div');
-    stop.className = 'bus-operator-stop';
-    stop.innerHTML = `📍 ${op.stop}`;
-    
-    opDiv.appendChild(title);
-    opDiv.appendChild(stop);
-
-    const routesDiv = document.createElement('div');
-    routesDiv.className = 'bus-routes';
-
-    op.routes.forEach(route => {
-      // バスも同様に2段表示にする
-      const nexts = getNextDepartures(route.times, 2);
-      const card = document.createElement('div');
-      card.className = 'card bus-card';
-      card.id = `card-${route.id}`;
-
-      let innerHtml = `<div class="card-route">${route.dest}</div>`;
-
-      if (nexts.length === 0) {
-        innerHtml += `<div style="color:var(--muted);font-size:0.85rem;margin-top:6px">本日の運行終了</div>`;
-      } else {
-        innerHtml += `<div class="departures-list">`;
-        nexts.forEach((dep, i) => {
-          innerHtml += generateDepartureItem(dep, route.dest, WALK_MINUTES.bus, `cd-bus-${route.id}`, i);
-        });
-        innerHtml += `</div>`;
-      }
-      card.innerHTML = innerHtml;
-      routesDiv.appendChild(card);
-    });
-    
-    opDiv.appendChild(routesDiv);
-    body.appendChild(opDiv);
-  });
+function updateAllLists() {
+  renderList('list-train-west', 'train-west');
+  renderList('list-train-east', 'train-east');
+  renderList('list-bus-uno',    'bus-uno');
+  renderList('list-bus-okaden', 'bus-okaden');
 }
 
 /* ============================================================
-   カウントダウンのみ高速更新
-   ============================================================ */
-function updateCountdowns() {
-  TRAIN_GROUPS.forEach(group => {
-    group.lines.forEach(line => {
-      const nexts = getNextDepartures(line.times, 2);
-      nexts.forEach((dep, i) => {
-        const el = document.getElementById(`cd-train-${line.id}-${i}`);
-        const badge = document.getElementById(`cd-train-${line.id}-badge-${i}`);
-        if (!el || !badge) return;
-
-        const status = getStatus(dep.min, WALK_MINUTES.train.normal, WALK_MINUTES.train.hurry);
-        el.textContent = fmtMin(dep.min);
-        el.className = `card-countdown ${status.cdCls}${dep.min <= WALK_MINUTES.train.hurry && dep.min >= 0 ? ' blink' : ''}`;
-        
-        badge.className = `card-status ${status.cls}`;
-        badge.textContent = status.label;
-      });
-    });
-  });
-
-  BUS_OPERATORS.forEach(op => {
-    op.routes.forEach(route => {
-      const nexts = getNextDepartures(route.times, 2);
-      nexts.forEach((dep, i) => {
-        const el = document.getElementById(`cd-bus-${route.id}-${i}`);
-        const badge = document.getElementById(`cd-bus-${route.id}-badge-${i}`);
-        if (!el || !badge) return;
-
-        const status = getStatus(dep.min, WALK_MINUTES.bus.normal, WALK_MINUTES.bus.hurry);
-        el.textContent = fmtMin(dep.min);
-        el.className = `card-countdown ${status.cdCls}${dep.min <= WALK_MINUTES.bus.hurry && dep.min >= 0 ? ' blink' : ''}`;
-        
-        badge.className = `card-status ${status.cls}`;
-        badge.textContent = status.label;
-      });
-    });
-  });
-}
-
-/* ============================================================
-   フル再描画
-   ============================================================ */
-function fullUpdate() {
-  buildTrainCards();
-  buildBusCards();
-  const t = now();
-  const pad = x => String(x).padStart(2,'0');
-  document.getElementById('update-badge').textContent =
-    `🔄 最終更新 ${pad(t.getHours())}:${pad(t.getMinutes())}`;
-}
-
-/* ============================================================
-   初期化 & タイマー設定
+   初期化 & ループ
    ============================================================ */
 (function init() {
   updateClock();
-  fullUpdate();
+  updateAllLists();
 
-  setInterval(updateClock, 1000);        // 時計：毎秒
-  setInterval(updateCountdowns, 10000);  // カウントダウン：10秒ごと
-  setInterval(fullUpdate, 60000);        // フル再描画：1分ごと
+  setInterval(updateClock, 1000);       // 時計は毎秒
+  setInterval(updateAllLists, 10000);   // リストは10秒ごとに再計算・描画
 })();
 </script>
 </body>
