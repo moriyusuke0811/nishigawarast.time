@@ -18,10 +18,12 @@
   --accent:    #38bdf8;
   --train:     #34d399;
   --bus:       #fb923c;
-  --ok:        #4ade80;
-  --hurry:     #facc15;
-  --danger:    #f87171;
-  --gone:      #6b7280;
+  
+  /* ステータスカラー */
+  --ok:        #4ade80; /* 緑：余裕あり */
+  --hurry:     #facc15; /* 黄：急げばOK */
+  --danger:    #f87171; /* 赤：厳しい */
+  --gone:      #6b7280; /* 灰：発車済 */
 
   --font-display: 'Noto Sans JP', sans-serif;
   --r: 10px;
@@ -164,9 +166,7 @@ html, body {
   overflow: hidden;
 }
 
-/* ============================================================
-   電車・バス 共通グループUI（左右分割用）
-   ============================================================ */
+/* 左右分割用 */
 .group-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -227,54 +227,85 @@ html, body {
   color: var(--muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  margin-bottom: 4px;
 }
 .train-card .card-route { color: #6ee7b7; }
 .bus-card  .card-route  { color: #fdba74; }
 
+/* 2段表示用リストレイアウト */
+.departures-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.departure-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+/* 1本目は少し大きく、2本目は少し小さく */
+.departure-item:first-child {
+  padding: 8px 10px;
+}
+.departure-item:last-child {
+  opacity: 0.85;
+}
+
+.dep-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .card-dest {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 900;
   color: var(--text);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+.departure-item:first-child .card-dest {
+  font-size: 1.25rem;
 }
 
-.card-time-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-top: 2px;
-}
 .card-time {
-  font-size: 1.6rem;
-  font-weight: 900;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
+
+.dep-status-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 .card-countdown {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   min-width: 4.5ch;
+  text-align: right;
 }
-
-.card-walk {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-top: 2px;
+.departure-item:first-child .card-countdown {
+  font-size: 2rem;
 }
 
 .card-status {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.9rem;
+  justify-content: center;
+  font-size: 0.85rem;
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
-  align-self: flex-start;
-  margin-top: 2px;
+  min-width: 80px;
 }
 .status-ok     { background: rgba(74,222,128,.15); color: var(--ok);     border: 1px solid rgba(74,222,128,.4); }
 .status-hurry  { background: rgba(250,204,21,.15);  color: var(--hurry);  border: 1px solid rgba(250,204,21,.4); }
@@ -308,32 +339,33 @@ html, body {
 }
 
 /* ============================================================
-   フッター
+   フッター (判例)
    ============================================================ */
 #footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 16px;
+  padding: 8px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--muted);
   flex-shrink: 0;
 }
 .footer-note {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  font-weight: 700;
 }
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 .legend-dot {
-  width: 10px; height: 10px;
+  width: 12px; height: 12px;
   border-radius: 50%;
   display: inline-block;
 }
@@ -369,7 +401,7 @@ html, body {
       <div class="section-header">
         <span class="section-icon">🚃</span>
         <h2>電車（JR西川原・就実駅）</h2>
-        <span class="section-subtitle">徒歩：学校→駅 約5分</span>
+        <span class="section-subtitle">🚶 徒歩：通常 12分 ／ 急いで 8分</span>
       </div>
       <div class="section-body group-grid" id="train-cards">
         </div>
@@ -379,7 +411,7 @@ html, body {
       <div class="section-header">
         <span class="section-icon">🚌</span>
         <h2>バス</h2>
-        <span class="section-subtitle">徒歩：学校→バス停 約3〜5分</span>
+        <span class="section-subtitle">🚶 徒歩：通常 5分 ／ 急いで 3分</span>
       </div>
       <div class="section-body group-grid" id="bus-body">
         </div>
@@ -388,11 +420,12 @@ html, body {
 
   <footer id="footer">
     <div class="footer-note">
-      <span>※ 表示は参考用です。実際のダイヤは事前にご確認ください。</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span>余裕あり（5分以上）</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--hurry)"></span>急げ（3〜5分）</span>
-      <span class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>厳しい（3分未満）</span>
+      <span style="color:var(--text); margin-right: 10px;">【色の見方】</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span>緑：余裕あり（12分以上）</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--hurry)"></span>黄：急げば間に合う（8〜11分）</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>赤：厳しい・間に合わない（8分未満）</span>
     </div>
+    <span style="font-weight:normal;">※表示は参考用です</span>
   </footer>
 </div>
 
@@ -401,10 +434,10 @@ html, body {
    データ定義
    ============================================================ */
 
+// 徒歩時間定義（通常, 急ぎ）
 const WALK_MINUTES = {
-  train: 5,   // 学校→西川原・就実駅
-  uno:   5,   // 学校→中央警察署前（宇野自動車）
-  kdenkibus: 4  // 学校→浜本町（岡山電気軌道バス）
+  train: { normal: 12, hurry: 8 },  // 学校→駅
+  bus:   { normal: 5,  hurry: 3 }   // 学校→バス停（目安として統一）
 };
 
 /* --- 電車 時刻表（左右グループ分割） --- */
@@ -479,42 +512,18 @@ const TRAIN_GROUPS = [
         label: '赤穂線方面',
         dest: '東岡山・播州赤穂方面',
         times: [
-          { time: '05:17', dest: '播州赤穂' },
-          { time: '05:59', dest: '播州赤穂' },
-          { time: '06:25', dest: '播州赤穂' },
-          { time: '07:30', dest: '播州赤穂' },
-          { time: '07:42', dest: '西大寺' },
-          { time: '07:55', dest: '長船' },
-          { time: '08:28', dest: '播州赤穂' },
-          { time: '08:35', dest: '播州赤穂' },
-          { time: '08:53', dest: '長船' },
-          { time: '10:11', dest: '長船' },
-          { time: '10:59', dest: '播州赤穂' },
-          { time: '11:27', dest: '西大寺' },
-          { time: '11:57', dest: '長船' },
-          { time: '12:27', dest: '播州赤穂' },
-          { time: '12:44', dest: '西大寺' },
-          { time: '13:26', dest: '長船' },
-          { time: '13:58', dest: '播州赤穂' },
-          { time: '14:25', dest: '備前片上' },
-          { time: '14:43', dest: '西大寺' },
-          { time: '15:00', dest: '播州赤穂' },
-          { time: '15:28', dest: '長船' },
-          { time: '15:58', dest: '播州赤穂' },
-          { time: '16:21', dest: '長船' },
-          { time: '16:38', dest: '播州赤穂' },
-          { time: '17:02', dest: '備前片上' },
-          { time: '17:30', dest: '播州赤穂' },
-          { time: '17:53', dest: '備前片上' },
-          { time: '18:20', dest: '播州赤穂' },
-          { time: '18:44', dest: '長船' },
-          { time: '19:15', dest: '播州赤穂' },
-          { time: '19:37', dest: '備前片上' },
-          { time: '20:08', dest: '播州赤穂' },
-          { time: '20:44', dest: '日生' },
-          { time: '21:26', dest: '播州赤穂' },
-          { time: '22:08', dest: '長船' },
-          { time: '23:15', dest: '備前片上' }
+          { time: '05:17', dest: '播州赤穂' }, { time: '05:59', dest: '播州赤穂' }, { time: '06:25', dest: '播州赤穂' },
+          { time: '07:30', dest: '播州赤穂' }, { time: '07:42', dest: '西大寺' }, { time: '07:55', dest: '長船' },
+          { time: '08:28', dest: '播州赤穂' }, { time: '08:35', dest: '播州赤穂' }, { time: '08:53', dest: '長船' },
+          { time: '10:11', dest: '長船' }, { time: '10:59', dest: '播州赤穂' }, { time: '11:27', dest: '西大寺' },
+          { time: '11:57', dest: '長船' }, { time: '12:27', dest: '播州赤穂' }, { time: '12:44', dest: '西大寺' },
+          { time: '13:26', dest: '長船' }, { time: '13:58', dest: '播州赤穂' }, { time: '14:25', dest: '備前片上' },
+          { time: '14:43', dest: '西大寺' }, { time: '15:00', dest: '播州赤穂' }, { time: '15:28', dest: '長船' },
+          { time: '15:58', dest: '播州赤穂' }, { time: '16:21', dest: '長船' }, { time: '16:38', dest: '播州赤穂' },
+          { time: '17:02', dest: '備前片上' }, { time: '17:30', dest: '播州赤穂' }, { time: '17:53', dest: '備前片上' },
+          { time: '18:20', dest: '播州赤穂' }, { time: '18:44', dest: '長船' }, { time: '19:15', dest: '播州赤穂' },
+          { time: '19:37', dest: '備前片上' }, { time: '20:08', dest: '播州赤穂' }, { time: '20:44', dest: '日生' },
+          { time: '21:26', dest: '播州赤穂' }, { time: '22:08', dest: '長船' }, { time: '23:15', dest: '備前片上' }
         ]
       }
     ]
@@ -527,7 +536,7 @@ const BUS_OPERATORS = [
     id: 'uno',
     name: '宇野自動車',
     stop: 'バス停：中央警察署前',
-    walkMinutes: WALK_MINUTES.uno,
+    walkMinutes: WALK_MINUTES.bus,
     routes: [
       {
         id: 'uno-hyogo',
@@ -559,7 +568,7 @@ const BUS_OPERATORS = [
     id: 'kdenkibus',
     name: '岡山電気軌道バス',
     stop: 'バス停：浜本町',
-    walkMinutes: WALK_MINUTES.kdenkibus,
+    walkMinutes: WALK_MINUTES.bus,
     routes: [
       {
         id: 'kdenkibus-okayama',
@@ -606,7 +615,8 @@ function minutesUntil(hhmm) {
   return (toDate(hhmm) - now()) / 60000;
 }
 
-function getNextDepartures(times, count = 1) {
+// 指定した件数（count）だけ次の便を取得
+function getNextDepartures(times, count = 2) {
   const upcoming = times
     .map(item => {
       const isStr = typeof item === 'string';
@@ -619,13 +629,12 @@ function getNextDepartures(times, count = 1) {
   return upcoming.slice(0, count);
 }
 
-function getStatus(minutesLeft, walkMin) {
-  const margin = minutesLeft - walkMin;
-  if (minutesLeft < 0)      return { label: '発車済み', cls: 'status-gone',  cdCls: 'cd-gone'  };
-  if (margin >= 5)           return { label: '余裕あり ✓', cls: 'status-ok',   cdCls: 'cd-ok'    };
-  if (margin >= 2)           return { label: '急げ！',  cls: 'status-hurry', cdCls: 'cd-hurry' };
-  if (margin >= 0)           return { label: '厳しい…', cls: 'status-tight', cdCls: 'cd-tight' };
-  return                     { label: '間に合わない', cls: 'status-gone',  cdCls: 'cd-gone'  };
+// 時間に応じた緑・黄・赤のステータス判定
+function getStatus(minutesLeft, normalMin, hurryMin) {
+  if (minutesLeft < 0) return { label: '発車済', cls: 'status-gone',  cdCls: 'cd-gone' };
+  if (minutesLeft >= normalMin) return { label: '余裕あり', cls: 'status-ok',   cdCls: 'cd-ok' }; // 12分以上（緑）
+  if (minutesLeft >= hurryMin)  return { label: '急げばOK', cls: 'status-hurry',cdCls: 'cd-hurry' }; // 8〜11分（黄）
+  return { label: '厳しい', cls: 'status-tight', cdCls: 'cd-tight' }; // 8分未満（赤）
 }
 
 function fmtMin(min) {
@@ -651,6 +660,26 @@ function updateClock() {
 /* ============================================================
    UI 生成（電車・バス）
    ============================================================ */
+
+function generateDepartureItem(dep, defaultDest, walkConfig, idPrefix, index) {
+  const status = getStatus(dep.min, walkConfig.normal, walkConfig.hurry);
+  const blinkCls = dep.min <= walkConfig.hurry && dep.min >= 0 ? 'blink' : '';
+  const displayDest = dep.dest ? `${dep.dest} 行き` : defaultDest;
+
+  return `
+    <div class="departure-item">
+      <div class="dep-main">
+        <div class="card-dest">${displayDest}</div>
+        <div class="card-time">${dep.time}</div>
+      </div>
+      <div class="dep-status-col">
+        <div class="card-countdown ${status.cdCls} ${blinkCls}" id="${idPrefix}-${index}">${fmtMin(dep.min)}</div>
+        <div class="card-status ${status.cls}" id="${idPrefix}-badge-${index}">${status.label}</div>
+      </div>
+    </div>
+  `;
+}
+
 function buildTrainCards() {
   const container = document.getElementById('train-cards');
   container.innerHTML = '';
@@ -665,34 +694,24 @@ function buildTrainCards() {
     groupDiv.appendChild(title);
 
     group.lines.forEach(line => {
-      const nexts = getNextDepartures(line.times, 1);
+      // 2段表示にするために2件取得
+      const nexts = getNextDepartures(line.times, 2);
       const card = document.createElement('div');
       card.className = 'card train-card';
       card.id = `card-${line.id}`;
 
-      if (nexts.length === 0) {
-        card.innerHTML = `
-          <div class="card-route">${line.label}</div>
-          <div class="card-dest">${line.dest}</div>
-          <div style="color:var(--muted);font-size:0.9rem;margin-top:8px">本日の運行終了</div>
-        `;
-      } else {
-        const dep = nexts[0];
-        const status = getStatus(dep.min, WALK_MINUTES.train);
-        const blinkCls = dep.min <= 3 && dep.min >= 0 ? 'blink' : '';
-        const displayDest = dep.dest ? `${dep.dest} 行き` : line.dest;
+      let innerHtml = `<div class="card-route">${line.label}</div>`;
 
-        card.innerHTML = `
-          <div class="card-route">${line.label}</div>
-          <div class="card-dest">${displayDest}</div>
-          <div class="card-time-row">
-            <span class="card-time">${dep.time}</span>
-            <span class="card-countdown ${status.cdCls} ${blinkCls}" id="cd-${line.id}">${fmtMin(dep.min)}</span>
-          </div>
-          <div class="card-walk">🚶 徒歩約${WALK_MINUTES.train}分</div>
-          <div class="card-status ${status.cls}">${status.label}</div>
-        `;
+      if (nexts.length === 0) {
+        innerHtml += `<div style="color:var(--muted);font-size:0.9rem;margin-top:8px">本日の運行終了</div>`;
+      } else {
+        innerHtml += `<div class="departures-list">`;
+        nexts.forEach((dep, i) => {
+          innerHtml += generateDepartureItem(dep, line.dest, WALK_MINUTES.train, `cd-train-${line.id}`, i);
+        });
+        innerHtml += `</div>`;
       }
+      card.innerHTML = innerHtml;
       groupDiv.appendChild(card);
     });
     container.appendChild(groupDiv);
@@ -713,7 +732,7 @@ function buildBusCards() {
     
     const stop = document.createElement('div');
     stop.className = 'bus-operator-stop';
-    stop.innerHTML = `📍 ${op.stop}（徒歩約${op.walkMinutes}分）`;
+    stop.innerHTML = `📍 ${op.stop}`;
     
     opDiv.appendChild(title);
     opDiv.appendChild(stop);
@@ -722,32 +741,24 @@ function buildBusCards() {
     routesDiv.className = 'bus-routes';
 
     op.routes.forEach(route => {
-      const nexts = getNextDepartures(route.times, 1);
+      // バスも同様に2段表示にする
+      const nexts = getNextDepartures(route.times, 2);
       const card = document.createElement('div');
       card.className = 'card bus-card';
       card.id = `card-${route.id}`;
 
-      if (nexts.length === 0) {
-        card.innerHTML = `
-          <div class="card-route">${route.dest}</div>
-          <div style="color:var(--muted);font-size:0.85rem;margin-top:6px">本日の運行終了</div>
-        `;
-      } else {
-        const dep = nexts[0];
-        const status = getStatus(dep.min, op.walkMinutes);
-        const blinkCls = dep.min <= 3 && dep.min >= 0 ? 'blink' : '';
-        const displayDest = dep.dest ? `${dep.dest} 行き` : route.dest;
+      let innerHtml = `<div class="card-route">${route.dest}</div>`;
 
-        card.innerHTML = `
-          <div class="card-route">${displayDest}</div>
-          <div class="card-time-row" style="margin-top:4px">
-            <span class="card-time" style="font-size:1.3rem">${dep.time}</span>
-            <span class="card-countdown ${status.cdCls} ${blinkCls}" style="font-size:1.5rem" id="bcd-${route.id}">${fmtMin(dep.min)}</span>
-          </div>
-          <div class="card-walk" style="font-size:0.7rem">🚶 徒歩約${op.walkMinutes}分</div>
-          <div class="card-status ${status.cls}" style="font-size:0.8rem;padding:2px 8px">${status.label}</div>
-        `;
+      if (nexts.length === 0) {
+        innerHtml += `<div style="color:var(--muted);font-size:0.85rem;margin-top:6px">本日の運行終了</div>`;
+      } else {
+        innerHtml += `<div class="departures-list">`;
+        nexts.forEach((dep, i) => {
+          innerHtml += generateDepartureItem(dep, route.dest, WALK_MINUTES.bus, `cd-bus-${route.id}`, i);
+        });
+        innerHtml += `</div>`;
       }
+      card.innerHTML = innerHtml;
       routesDiv.appendChild(card);
     });
     
@@ -762,45 +773,37 @@ function buildBusCards() {
 function updateCountdowns() {
   TRAIN_GROUPS.forEach(group => {
     group.lines.forEach(line => {
-      const el = document.getElementById(`cd-${line.id}`);
-      if (!el) return;
-      const nexts = getNextDepartures(line.times, 1);
-      if (nexts.length === 0) return;
-      const dep = nexts[0];
-      const status = getStatus(dep.min, WALK_MINUTES.train);
-      el.textContent = fmtMin(dep.min);
-      el.className = `card-countdown ${status.cdCls}${dep.min <= 3 && dep.min >= 0 ? ' blink' : ''}`;
+      const nexts = getNextDepartures(line.times, 2);
+      nexts.forEach((dep, i) => {
+        const el = document.getElementById(`cd-train-${line.id}-${i}`);
+        const badge = document.getElementById(`cd-train-${line.id}-badge-${i}`);
+        if (!el || !badge) return;
 
-      const card = document.getElementById(`card-${line.id}`);
-      if (card) {
-        const badge = card.querySelector('.card-status');
-        if (badge) {
-          badge.className = `card-status ${status.cls}`;
-          badge.textContent = status.label;
-        }
-      }
+        const status = getStatus(dep.min, WALK_MINUTES.train.normal, WALK_MINUTES.train.hurry);
+        el.textContent = fmtMin(dep.min);
+        el.className = `card-countdown ${status.cdCls}${dep.min <= WALK_MINUTES.train.hurry && dep.min >= 0 ? ' blink' : ''}`;
+        
+        badge.className = `card-status ${status.cls}`;
+        badge.textContent = status.label;
+      });
     });
   });
 
   BUS_OPERATORS.forEach(op => {
     op.routes.forEach(route => {
-      const el = document.getElementById(`bcd-${route.id}`);
-      if (!el) return;
-      const nexts = getNextDepartures(route.times, 1);
-      if (nexts.length === 0) return;
-      const dep = nexts[0];
-      const status = getStatus(dep.min, op.walkMinutes);
-      el.textContent = fmtMin(dep.min);
-      el.className = `card-countdown ${status.cdCls}${dep.min <= 3 && dep.min >= 0 ? ' blink' : ''}`;
+      const nexts = getNextDepartures(route.times, 2);
+      nexts.forEach((dep, i) => {
+        const el = document.getElementById(`cd-bus-${route.id}-${i}`);
+        const badge = document.getElementById(`cd-bus-${route.id}-badge-${i}`);
+        if (!el || !badge) return;
 
-      const card = document.getElementById(`card-${route.id}`);
-      if (card) {
-        const badge = card.querySelector('.card-status');
-        if (badge) {
-          badge.className = `card-status ${status.cls}`;
-          badge.textContent = status.label;
-        }
-      }
+        const status = getStatus(dep.min, WALK_MINUTES.bus.normal, WALK_MINUTES.bus.hurry);
+        el.textContent = fmtMin(dep.min);
+        el.className = `card-countdown ${status.cdCls}${dep.min <= WALK_MINUTES.bus.hurry && dep.min >= 0 ? ' blink' : ''}`;
+        
+        badge.className = `card-status ${status.cls}`;
+        badge.textContent = status.label;
+      });
     });
   });
 }
