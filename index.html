@@ -43,7 +43,6 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Google Fonts の代わりに system font stack で高品質に */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
 
 /* ============================================================
@@ -168,7 +167,6 @@ html, body {
   overflow: hidden;
 }
 
-/* 電車は2列グリッド */
 .train-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -191,7 +189,6 @@ html, body {
   overflow: hidden;
 }
 
-/* カードのアクセントライン */
 .card::before {
   content: '';
   position: absolute;
@@ -246,7 +243,6 @@ html, body {
   margin-top: 2px;
 }
 
-/* 間に合うか判定バッジ */
 .card-status {
   display: inline-flex;
   align-items: center;
@@ -263,7 +259,6 @@ html, body {
 .status-tight  { background: rgba(248,113,113,.15); color: var(--danger); border: 1px solid rgba(248,113,113,.4); }
 .status-gone   { background: rgba(107,114,128,.15); color: var(--gone);   border: 1px solid rgba(107,114,128,.4); }
 
-/* カウントダウン色 */
 .cd-ok     { color: var(--ok); }
 .cd-hurry  { color: var(--hurry); }
 .cd-tight  { color: var(--danger); }
@@ -336,24 +331,11 @@ html, body {
 }
 .blink { animation: blink 1s ease-in-out infinite; }
 
-/* ============================================================
-   エラー表示
-   ============================================================ */
-.error-msg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--danger);
-  font-size: 1rem;
-}
 </style>
 </head>
 <body>
 
 <div id="app">
-
-  <!-- ===== ヘッダー ===== -->
   <header id="header">
     <div class="header-title">
       <span class="icon">🚉</span>
@@ -369,10 +351,7 @@ html, body {
     </div>
   </header>
 
-  <!-- ===== メインコンテンツ ===== -->
   <main id="main">
-
-    <!-- 電車セクション -->
     <section class="section" id="train-section">
       <div class="section-header">
         <span class="section-icon">🚃</span>
@@ -380,11 +359,9 @@ html, body {
         <span class="section-subtitle">徒歩：学校→駅 約5分</span>
       </div>
       <div class="section-body train-body" id="train-cards">
-        <!-- JS で生成 -->
-      </div>
+        </div>
     </section>
 
-    <!-- バスセクション -->
     <section class="section" id="bus-section">
       <div class="section-header">
         <span class="section-icon">🚌</span>
@@ -392,43 +369,32 @@ html, body {
         <span class="section-subtitle">徒歩：学校→バス停 約3〜5分</span>
       </div>
       <div class="section-body" id="bus-body">
-        <!-- JS で生成 -->
-      </div>
+        </div>
     </section>
-
   </main>
 
-  <!-- ===== フッター ===== -->
   <footer id="footer">
     <div class="footer-note">
-      <span>※ 表示は参考用です。ダイヤは必ず駅・バス停でご確認ください。</span>
+      <span>※ 表示は参考用です。実際のダイヤは事前にご確認ください。</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span>余裕あり（5分以上）</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--hurry)"></span>急げ（3〜5分）</span>
       <span class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span>厳しい（3分未満）</span>
     </div>
-    <span>データ：静的時刻表（サンプル） ／ 実際のダイヤは事前にご確認ください</span>
   </footer>
-
-</div><!-- /#app -->
+</div>
 
 <script>
 /* ============================================================
    時刻表データ定義
-   ※ 文化祭当日の実際の時刻表に合わせて書き換えてください
-   形式: "HH:MM"
    ============================================================ */
 
-// 学校からの徒歩時間（分）
 const WALK_MINUTES = {
   train: 5,   // 学校→西川原・就実駅
   uno:   5,   // 学校→中央警察署前（宇野自動車）
   kdenkibus: 4  // 学校→浜本町（岡山電気軌道バス）
 };
 
-/* --- 電車 時刻表 ---
-   JR山陽本線・伯備線・赤穂線（西川原・就実駅）
-   ※ 下記はサンプルです。実際の時刻表に差し替えてください。
-*/
+/* --- 電車 時刻表 --- */
 const TRAIN_LINES = [
   {
     id: 'hakubi',
@@ -477,20 +443,41 @@ const TRAIN_LINES = [
   {
     id: 'ako',
     label: '赤穂線方面',
-    dest: '東岡山・播州赤穂方面',
+    dest: '東岡山・播州赤穂方面', // 全体の基本行き先（フォールバック）
     color: '#34d399',
     times: [
-      '07:20','08:00','08:45','09:25','10:10','10:55','11:40',
-      '12:20','13:00','13:45','14:25','15:05','15:50','16:30',
-      '17:10','17:55','18:35','19:15','19:55','20:35','21:20',
-      '22:00'
+      // CSVから抽出したデータをオブジェクト化（行き先個別指定）
+      { time: '05:17', dest: '播州赤穂' },
+      { time: '05:59', dest: '播州赤穂' },
+      { time: '06:25', dest: '播州赤穂' },
+      { time: '07:30', dest: '播州赤穂' },
+      { time: '07:42', dest: '西大寺' },
+      { time: '07:55', dest: '長船' },
+      { time: '08:28', dest: '播州赤穂' },
+      { time: '08:35', dest: '播州赤穂' },
+      { time: '09:03', dest: '長船' }, 
+      { time: '09:28', dest: '播州赤穂' },
+      { time: '10:11', dest: '長船' },
+      { time: '10:59', dest: '播州赤穂' },
+      { time: '11:27', dest: '西大寺' },
+      { time: '11:57', dest: '長船' },
+      { time: '12:27', dest: '播州赤穂' },
+      { time: '12:44', dest: '西大寺' },
+      { time: '13:26', dest: '長船' },
+      { time: '13:58', dest: '播州赤穂' },
+      { time: '14:25', dest: '備前片上' },
+      { time: '14:43', dest: '西大寺' },
+      { time: '15:00', dest: '播州赤穂' },
+      { time: '15:28', dest: '長船' },
+      { time: '15:58', dest: '播州赤穂' },
+      { time: '16:21', dest: '長船' },
+      { time: '16:38', dest: '播州赤穂' },
+      { time: '17:02', dest: '備前片上' }
     ]
   }
 ];
 
-/* --- バス 時刻表 ---
-   ※ 下記はサンプルです。実際の時刻表に差し替えてください。
-*/
+/* --- バス 時刻表 --- */
 const BUS_OPERATORS = [
   {
     id: 'uno',
@@ -562,10 +549,8 @@ const BUS_OPERATORS = [
    ユーティリティ関数
    ============================================================ */
 
-/** 現在時刻を取得 */
 function now() { return new Date(); }
 
-/** "HH:MM" 文字列を当日の Date オブジェクトに変換 */
 function toDate(hhmm) {
   const [h, m] = hhmm.split(':').map(Number);
   const d = new Date();
@@ -573,31 +558,35 @@ function toDate(hhmm) {
   return d;
 }
 
-/** 分差を計算（正=未来, 負=過去） */
 function minutesUntil(hhmm) {
   return (toDate(hhmm) - now()) / 60000;
 }
 
-/** 次の便を返す（現在時刻より後の最初の便）*/
+/** * 次の便を返す
+ * times: 文字列('07:30') または オブジェクト({time: '07:30', dest: '長船'}) の配列
+ */
 function getNextDepartures(times, count = 1) {
   const upcoming = times
-    .map(t => ({ time: t, min: minutesUntil(t) }))
+    .map(item => {
+      const isStr = typeof item === 'string';
+      const timeStr = isStr ? item : item.time;
+      const destStr = isStr ? null : item.dest;
+      return { time: timeStr, dest: destStr, min: minutesUntil(timeStr) };
+    })
     .filter(t => t.min > -1)   // 1分前まで表示
     .sort((a, b) => a.min - b.min);
   return upcoming.slice(0, count);
 }
 
-/** 徒歩時間を踏まえたステータス判定 */
 function getStatus(minutesLeft, walkMin) {
   const margin = minutesLeft - walkMin;
   if (minutesLeft < 0)      return { label: '発車済み', cls: 'status-gone',  cdCls: 'cd-gone'  };
   if (margin >= 5)           return { label: '余裕あり ✓', cls: 'status-ok',   cdCls: 'cd-ok'    };
   if (margin >= 2)           return { label: '急げ！',  cls: 'status-hurry', cdCls: 'cd-hurry' };
   if (margin >= 0)           return { label: '厳しい…', cls: 'status-tight', cdCls: 'cd-tight' };
-  return                            { label: '間に合わない', cls: 'status-gone',  cdCls: 'cd-gone'  };
+  return                     { label: '間に合わない', cls: 'status-gone',  cdCls: 'cd-gone'  };
 }
 
-/** 残り時間を表示文字列に変換 */
 function fmtMin(min) {
   if (min < 0) return '発車済';
   if (min < 1) return '間もなく';
@@ -641,10 +630,13 @@ function buildTrainCards() {
       const dep = nexts[0];
       const status = getStatus(dep.min, WALK_MINUTES.train);
       const blinkCls = dep.min <= 3 && dep.min >= 0 ? 'blink' : '';
+      
+      // 個別の行き先データがあれば優先表示、なければ路線の基本行き先
+      const displayDest = dep.dest ? `${dep.dest} 行き` : line.dest;
 
       card.innerHTML = `
         <div class="card-route">${line.label}</div>
-        <div class="card-dest">${line.dest}</div>
+        <div class="card-dest">${displayDest}</div>
         <div class="card-time-row">
           <span class="card-time">${dep.time}</span>
           <span class="card-countdown ${status.cdCls} ${blinkCls}" id="cd-${line.id}">${fmtMin(dep.min)}</span>
@@ -682,8 +674,10 @@ function buildBusCards() {
         const status = getStatus(dep.min, op.walkMinutes);
         const blinkCls = dep.min <= 3 && dep.min >= 0 ? 'blink' : '';
 
+        const displayDest = dep.dest ? `${dep.dest} 行き` : route.dest;
+
         inner = `
-          <div class="card-route">${route.dest}</div>
+          <div class="card-route">${displayDest}</div>
           <div class="card-time-row" style="margin-top:4px">
             <span class="card-time" style="font-size:1.3rem">${dep.time}</span>
             <span class="card-countdown ${status.cdCls} ${blinkCls}" style="font-size:1.5rem" id="bcd-${route.id}">${fmtMin(dep.min)}</span>
@@ -709,7 +703,6 @@ function buildBusCards() {
    カウントダウンのみ高速更新（10秒ごと）
    ============================================================ */
 function updateCountdowns() {
-  // 電車
   TRAIN_LINES.forEach(line => {
     const el = document.getElementById(`cd-${line.id}`);
     if (!el) return;
@@ -720,7 +713,6 @@ function updateCountdowns() {
     el.textContent = fmtMin(dep.min);
     el.className = `card-countdown ${status.cdCls}${dep.min <= 3 && dep.min >= 0 ? ' blink' : ''}`;
 
-    // ステータスバッジも更新
     const card = document.getElementById(`card-${line.id}`);
     if (card) {
       const badge = card.querySelector('.card-status');
@@ -731,7 +723,6 @@ function updateCountdowns() {
     }
   });
 
-  // バス
   BUS_OPERATORS.forEach(op => {
     op.routes.forEach(route => {
       const el = document.getElementById(`bcd-${route.id}`);
@@ -762,8 +753,9 @@ function fullUpdate() {
   buildTrainCards();
   buildBusCards();
   const t = now();
+  const pad = x => String(x).padStart(2,'0');
   document.getElementById('update-badge').textContent =
-    `🔄 最終更新 ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+    `🔄 最終更新 ${pad(t.getHours())}:${pad(t.getMinutes())}`;
 }
 
 /* ============================================================
@@ -773,9 +765,9 @@ function fullUpdate() {
   updateClock();
   fullUpdate();
 
-  setInterval(updateClock, 1000);         // 時計：毎秒
-  setInterval(updateCountdowns, 10000);   // カウントダウン：10秒ごと
-  setInterval(fullUpdate, 60000);         // フル再描画：1分ごと
+  setInterval(updateClock, 1000);        // 時計：毎秒
+  setInterval(updateCountdowns, 10000);  // カウントダウン：10秒ごと
+  setInterval(fullUpdate, 60000);        // フル再描画：1分ごと
 })();
 </script>
 </body>
