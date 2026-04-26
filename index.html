@@ -10,6 +10,7 @@
 :root {
   --sozanblue:#171D55;
   --darkblue:    #030312;
+  --surf:    #141f50; /* 補完 */
   --surf2:   #141f50;
   --card:    #202439;
   --bdr:     #2a3a7a;
@@ -78,12 +79,20 @@ html, body {
   min-height: 0;
 }
 
-/* ---- Section title row ---- */
+/* ---- Section Title Row (共通) ---- */
 .sec-title-row {
   display:flex; align-items:baseline; gap:10px; flex-shrink:0;
 }
 .sec-title { font-size:1.55rem; font-weight:900; white-space:nowrap;color: #fff; }
 .sec-meta  { font-size:.8rem; color:#fff; white-space:nowrap; }
+
+/* コンテンツを束ねるラッパー */
+.col-section {
+  display:flex; flex-direction:column; gap:6px; flex:1; min-height:0;
+}
+.col-section-auto {
+  display:flex; flex-direction:column; gap:6px; flex-shrink:0;
+}
 
 /* ---- Train section ---- */
 #train-section { display:flex; flex-direction:column; gap:6px; min-height:0; }
@@ -94,8 +103,8 @@ html, body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  background: var(--surf);
   padding: 10px;
+  border-radius: var(--r);
 }
 
 /* Route card */
@@ -107,7 +116,7 @@ html, body {
   flex-direction: column;
   gap: 5px;
   min-height: 0;
-  border: 1px solid #fff;
+  border: 3px solid #fff;
 }
 .r-head {
   display:flex; align-items:center; gap:8px;
@@ -168,45 +177,37 @@ html, body {
 /* ---- Bus section ---- */
 #bus-section {
   display: flex; flex-direction: column;
-  gap: 8px; min-height: 0;
+  gap: 12px; min-height: 0;
 }
 .op-block {
   flex:1; min-height:0;
-  background: var(--surf);
-  border: 1px solid var(--bdr);
+  background: var(--card);
+  border: 3px solid #fff;
   border-radius: var(--r);
-  padding: 8px 10px;
-  display: flex; flex-direction: column; gap:5px;
+  padding: 10px;
+  display: flex; flex-direction: column;
 }
-.op-title  { font-size:1.25rem; font-weight:900; color: #fff;}
-.op-stop   { font-size:.75rem; color:var(--muted); margin-top:-3px;color: #fff; }
-.op-dirs   { display:grid; grid-template-columns:1fr 1fr; gap:6px; flex:1; min-height:0;color: #fff; }
+.op-dirs   { display:grid; grid-template-columns:1fr 1fr; gap:8px; flex:1; min-height:0;color: #fff; }
 .op-dir    { display:flex; flex-direction:column; gap:4px; min-height:0; }
 .op-dir-hd {
-  font-size:.78rem; font-weight:700; color:var(--muted);
+  font-size:.85rem; font-weight:700; color:#fff;
   border-bottom:1px solid var(--bdr);
-  padding-bottom:3px; margin-bottom:1px; flex-shrink:0;
+  padding-bottom:4px; margin-bottom:2px; flex-shrink:0;
 }
 
 /* ---- Right column ---- */
-.right-col { display:flex; flex-direction:column; gap:8px; }
+.right-col { display:flex; flex-direction:column; gap:12px; }
 
 .c-box {
   background:var(--surf); border:2px solid var(--bdr);
-  border-radius:var(--r); padding:12px 10px;
+  border-radius:var(--r); padding:16px 10px;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
 }
-.c-title  { font-size:1.35rem; font-weight:900; letter-spacing:.04em; color: #fff;}
-.c-route  { font-size:.9rem; color:var(--muted); text-align:center; letter-spacing:.06em; color: #fff;}
 
 .fare-box {
   background:var(--surf); border:1px solid var(--bdr);
-  border-radius:var(--r); padding:10px 12px;
-  flex:1; display:flex; flex-direction:column; gap:6px;
-}
-.fare-ttl {
-  font-size:.95rem; font-weight:900;
-  border-bottom:1px solid var(--bdr); padding-bottom:5px; flex-shrink:0;
+  border-radius:var(--r); padding:10px 14px;
+  flex:1; display:flex; flex-direction:column; gap:8px; justify-content: center;
 }
 .fare-item { display:flex; flex-direction:column; gap:1px; }
 .fare-name  { font-size:.85rem; font-weight:700;color: #fff; }
@@ -221,7 +222,6 @@ html, body {
 <body>
 <div id="app">
 
-  <!-- HEADER -->
   <header id="hdr">
     <div class="h-festival">松柏祭</div>
     <div class="h-center"><div class="h-pill">交通案内</div></div>
@@ -232,10 +232,8 @@ html, body {
     </div>
   </header>
 
-  <!-- MAIN -->
   <main id="main">
 
-    <!-- 左：電車 -->
     <section id="train-section">
       <div class="sec-title-row">
         <span class="sec-title">電車【西川原駅】</span>
@@ -244,33 +242,45 @@ html, body {
       <div id="train-grid"></div>
     </section>
 
-    <!-- 中：バス -->
     <section id="bus-section"></section>
 
-    <!-- 右：直行バス・料金 -->
     <div class="right-col">
-      <div class="c-box">
-        <div class="c-title">直行バス</div>
-        <div class="c-route">本校 → 岡山駅</div>
-      </div>
-      <div class="fare-box">
-        <div class="fare-ttl">岡山駅までの料金</div>
-        <div class="fare-item">
-          <div class="fare-name">宇野バス（駅前町）</div>
-          <div class="fare-price">140円</div>
-          <div class="fare-note">＊ハレカ以外のIC利用不可</div>
+      
+      <div class="col-section-auto">
+        <div class="sec-title-row">
+          <span class="sec-title">直行バス</span>
+          <span class="sec-meta">本校 → 岡山駅</span>
         </div>
-        <div class="fare-item">
-          <div class="fare-name">岡電バス（岡山駅）</div>
-          <div class="fare-price">160円</div>
-          <div class="fare-note">＊IC利用可</div>
-        </div>
-        <div class="fare-item">
-          <div class="fare-name">JR（岡山駅）</div>
-          <div class="fare-price">150円</div>
-          <div class="fare-note">＊IC利用可</div>
+        <div class="c-box">
+          <span style="font-size:1.3rem; font-weight:900; color:#fff; letter-spacing:0.1em;">随時運行中</span>
+          <span style="font-size:0.85rem; color:var(--muted); text-align:center;">乗り場スタッフの指示に<br>従ってください</span>
         </div>
       </div>
+
+      <div class="col-section">
+        <div class="sec-title-row">
+          <span class="sec-title">運賃案内</span>
+          <span class="sec-meta">岡山駅まで</span>
+        </div>
+        <div class="fare-box">
+          <div class="fare-item">
+            <div class="fare-name">宇野バス（駅前町）</div>
+            <div class="fare-price">140円</div>
+            <div class="fare-note">＊ハレカ以外のIC利用不可</div>
+          </div>
+          <div class="fare-item">
+            <div class="fare-name">岡電バス（岡山駅）</div>
+            <div class="fare-price">160円</div>
+            <div class="fare-note">＊IC利用可</div>
+          </div>
+          <div class="fare-item">
+            <div class="fare-name">JR（岡山駅）</div>
+            <div class="fare-price">150円</div>
+            <div class="fare-note">＊IC利用可</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>
@@ -497,15 +507,17 @@ function buildTrain() {
 }
 
 /* ============================================================
-   バスUI生成
+   バスUI生成 (見出しを外に出した新構造)
    ============================================================ */
 function buildBus() {
   const sec = document.getElementById('bus-section');
   sec.innerHTML = '';
   BUS_OPS.forEach(op => {
-    const block = document.createElement('div');
-    block.className = 'op-block';
-    block.id = `bs-${op.id}`;
+    // 1事業者分のラッパー
+    const wrapper = document.createElement('div');
+    wrapper.className = 'col-section';
+    
+    // 行先方向（左右）のHTML組み立て
     const dirsHtml = op.dirs.map(dir => {
       const nexts = nextDep(dir.times, 2);
       let rows = '';
@@ -516,11 +528,18 @@ function buildBus() {
       }
       return `<div class="op-dir"><div class="op-dir-hd">${dir.name}</div>${rows}</div>`;
     }).join('');
-    block.innerHTML = `
-      <div class="op-title">${op.name}</div>
-      <div class="op-stop">${op.stop}</div>
-      <div class="op-dirs">${dirsHtml}</div>`;
-    sec.appendChild(block);
+    
+    // 見出し行を上に配置し、その下にカードを配置
+    wrapper.innerHTML = `
+      <div class="sec-title-row">
+        <span class="sec-title">${op.name}</span>
+        <span class="sec-meta">${op.stop}</span>
+      </div>
+      <div class="op-block" id="bs-${op.id}">
+        <div class="op-dirs">${dirsHtml}</div>
+      </div>`;
+    
+    sec.appendChild(wrapper);
   });
 }
 
