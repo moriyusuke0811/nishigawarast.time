@@ -447,7 +447,8 @@ const FALLBACK_BUS_OPS = [
       },
       {
         id:'okaden-fj', name:'藤原団地方面', short:'藤原団地方面',
-
+        // ダイヤ分離していない場合は今まで通り配列で記述可能
+        times:[]
       }
     ]
   },
@@ -456,9 +457,11 @@ const FALLBACK_BUS_OPS = [
     dirs:[
       {
         id:'uno-hy', name:'駅前町・表町方面', short:'表町方面',
+        times:[]
       },
       {
         id:'uno-hg', name:'東岡山方面', short:'東岡山方面',
+        times:[]
       }
     ]
   }
