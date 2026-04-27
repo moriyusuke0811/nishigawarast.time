@@ -453,7 +453,7 @@ const FALLBACK_BUS_OPS = [
     ]
   },
   {
-    id:'uno', name:'宇野バス【中央警察署前】', stop:'徒歩：5分（信号注意）', walk:WALK.bus,
+    id:'uno', name:'宇野バス【中央警察署前】', stop:'徒歩：10分（信号注意）', walk:WALK.bus,
     dirs:[
       {
         id:'uno-hy', name:'駅前町・表町方面', short:'表町方面',
@@ -532,8 +532,9 @@ function status(min, walk) {
   const hurry  = typeof walk==='object' ? walk.hurry  : walk;
   if (min<0)              return {lbl:'発車済',    sc:'s-gone',  cc:'cd-gone'};
   if (min-hurry >= 5)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
-  if (min-hurry >= 0)     return {lbl:'急げばOK',  sc:'s-hurry', cc:'cd-hurry'};
-  return                         {lbl:'厳しい',    sc:'s-tight', cc:'cd-tight'};
+  if (min-hurry >= 2)     return {lbl:'急げばOK',  sc:'s-hurry', cc:'cd-hurry'};
+  if (min-hurry >= 0)     return {lbl:'急げ！',  sc:'s-hurry', cc:'cd-hurry'};
+  return                         {lbl:'絶望的',    sc:'s-tight', cc:'cd-tight'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
