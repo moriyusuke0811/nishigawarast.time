@@ -69,7 +69,10 @@ html, body {
   color:#fff;
 }
 #hdr-date  { font-size:.85rem; color:#fff; }
-#hdr-badge { font-size:.72rem; color:#fff; }
+#hdr-badge { font-size:.72rem; color:#fff; display:flex; gap:6px; align-items:center; }
+
+.badge-mode { background:var(--ok); color:#000; padding:1px 6px; border-radius:10px; font-weight:bold; }
+.badge-sched { background:rgba(255,255,255,0.2); color:#fff; padding:1px 6px; border-radius:10px; font-weight:bold; }
 
 /* ---- MAIN 3-col ---- */
 #main {
@@ -97,7 +100,6 @@ html, body {
 /* ---- Train section ---- */
 #train-section { display:flex; flex-direction:column; gap:6px; min-height:0; }
 
-/* Train 2×2 grid inside a box */
 #train-grid {
   flex:1; min-height:0;
   display: grid;
@@ -108,7 +110,6 @@ html, body {
   border-radius: var(--r);
 }
 
-/* Route card */
 .r-card {
   background: var(--card);
   border-radius: 8px;
@@ -134,7 +135,6 @@ html, body {
 }
 .r-name { font-size:1rem; font-weight:700; }
 
-/* Departure list */
 .d-list { display:flex; flex-direction:column; gap:4px; flex:1; min-height:0; color: #fff;}
 
 .d-row {
@@ -229,7 +229,11 @@ html, body {
     <div class="h-right">
       <div id="clock">--:--:--</div>
       <div id="hdr-date"></div>
-      <div id="hdr-badge">・更新中</div>
+      <div id="hdr-badge">
+        <span id="sched-badge" class="badge-sched">--ダイヤ</span>
+        <span id="data-mode-badge" class="badge-mode">静的データ</span>
+        <span id="update-time-badge">・更新中</span>
+      </div>
     </div>
   </header>
 
@@ -246,7 +250,6 @@ html, body {
     <section id="bus-section"></section>
 
     <div class="right-col">
-      
       <div class="col-section-auto">
         <div class="sec-title-row">
           <span class="sec-title">直行バス</span>
@@ -257,7 +260,6 @@ html, body {
           <span style="font-size:0.85rem; color:var(--muted); text-align:center;">乗り場スタッフの指示に<br>従ってください</span>
         </div>
       </div>
-
       <div class="col-section">
         <div class="sec-title-row">
           <span class="sec-title">運賃案内</span>
@@ -281,7 +283,6 @@ html, body {
           </div>
         </div>
       </div>
-
     </div>
 
   </main>
@@ -291,16 +292,27 @@ html, body {
 'use strict';
 
 /* ============================================================
-   設定（徒歩時間）
+   設定（祝日・休校日リスト）
+   ここで指定した日付は強制的に「休日ダイヤ」になります
+   形式: 'YYYY-MM-DD'
    ============================================================ */
+const HOLIDAYS = [
+  '2024-09-16', // 敬老の日
+  '2024-09-22', // 秋分の日
+  '2024-09-23', // 振替休日
+  '2024-10-14', // スポーツの日
+  '2024-11-03', // 文化の日
+  '2024-11-04'  // 振替休日
+  // ※必要に応じて文化祭の振替休日などを追加してください
+];
+
 const WALK = {
   train: { normal: 17, hurry: 12 },
   bus:   { normal: 10,  hurry: 7 }
 };
 
 /* ============================================================
-   電車時刻表（西川原・就実駅）
-   ※ 必ずJR西日本公式サイトで確認・差し替えてください
+   電車時刻表（静的データ）
    ============================================================ */
 const TRAIN_LINES = [
   {
@@ -382,28 +394,62 @@ const TRAIN_LINES = [
 ];
 
 /* ============================================================
-   バス時刻表
+   バス時刻表（静的フォールバックデータ）
+   曜日によってダイヤを自動で切り替えます
    ============================================================ */
-const BUS_OPS = [
+const FALLBACK_BUS_OPS = [
   {
     id:'okaden', name:'岡電バス【浜本町】', stop:'徒歩：8分（信号注意）', walk:WALK.bus,
     dirs:[
       {
         id:'okaden-ok', name:'天満屋・岡山駅方面', short:'岡山駅方面',
-        times:['07:05','07:25','07:45','08:05','08:25','08:45',
-               '09:05','09:25','09:45','10:05','10:25','10:45',
-               '11:05','11:25','11:45','12:05','12:25','12:45',
-               '13:05','13:25','13:45','14:05','14:25','14:45',
-               '15:05','15:25','15:45','16:05','16:25','16:45',
-               '17:05','17:25','17:45','18:05','18:25','18:45',
-               '19:05','19:30','20:00','20:30','21:00','21:40']
+        // 曜日ごとに配列を分ける
+        times: {
+          weekday: [
+            {time:'06:54',dest:'岡山駅'}, {time:'07:22',dest:'岡山駅'}, {time:'08:02',dest:'岡山駅'},
+            {time:'08:27',dest:'岡山駅'}, {time:'08:52',dest:'京山'},   {time:'09:17',dest:'岡山駅'},
+            {time:'09:41',dest:'岡山駅'}, {time:'10:06',dest:'岡山駅'}, {time:'10:36',dest:'岡山駅'},
+            {time:'11:06',dest:'岡山駅'}, {time:'11:37',dest:'岡山駅'}, {time:'12:07',dest:'岡山駅'},
+            {time:'12:37',dest:'岡山駅'}, {time:'13:07',dest:'岡山駅'}, {time:'13:37',dest:'岡山駅'},
+            {time:'14:07',dest:'岡山駅'}, {time:'14:37',dest:'岡山駅'}, {time:'15:07',dest:'岡山駅'},
+            {time:'15:32',dest:'岡山駅'}, {time:'15:52',dest:'岡山駅'}, {time:'16:12',dest:'岡山駅'},
+            {time:'16:32',dest:'岡山駅'}, {time:'16:53',dest:'岡山駅'}, {time:'17:14',dest:'岡山駅'},
+            {time:'17:35',dest:'岡山駅'}, {time:'17:55',dest:'岡山駅'}, {time:'18:16',dest:'岡山駅'},
+            {time:'18:36',dest:'岡山駅'}, {time:'18:56',dest:'岡山駅'}, {time:'19:15',dest:'岡山駅'},
+            {time:'19:33',dest:'岡山駅'}, {time:'19:56',dest:'岡山駅'}, {time:'20:27',dest:'岡山駅'},
+            {time:'21:26',dest:'岡山駅'}
+          ],
+          saturday: [
+            {time:'06:58',dest:'京山'},   {time:'09:16',dest:'岡山駅'}, {time:'09:41',dest:'岡山駅'},
+            {time:'10:03',dest:'岡山駅'}, {time:'10:23',dest:'岡山駅'}, {time:'10:43',dest:'岡山駅'},
+            {time:'11:03',dest:'岡山駅'}, {time:'11:22',dest:'岡山駅'}, {time:'11:42',dest:'岡山駅'},
+            {time:'12:02',dest:'岡山駅'}, {time:'12:22',dest:'岡山駅'}, {time:'12:42',dest:'岡山駅'},
+            {time:'13:03',dest:'岡山駅'}, {time:'13:23',dest:'岡山駅'}, {time:'13:43',dest:'岡山駅'},
+            {time:'14:03',dest:'岡山駅'}, {time:'14:23',dest:'岡山駅'}, {time:'14:43',dest:'岡山駅'},
+            {time:'15:04',dest:'岡山駅'}, {time:'15:24',dest:'岡山駅'}, {time:'15:44',dest:'岡山駅'},
+            {time:'16:04',dest:'岡山駅'}, {time:'16:24',dest:'岡山駅'}, {time:'17:05',dest:'岡山駅'},
+            {time:'17:26',dest:'岡山駅'}, {time:'19:23',dest:'岡山駅'}, {time:'19:58',dest:'岡山駅'},
+            {time:'20:23',dest:'岡山駅'}, {time:'21:27',dest:'岡山駅'}
+          ],
+          holiday: [
+            {time:'06:58',dest:'京山'},   {time:'09:16',dest:'岡山駅'}, {time:'09:41',dest:'岡山駅'},
+            {time:'10:03',dest:'岡山駅'}, {time:'10:23',dest:'岡山駅'}, {time:'10:43',dest:'岡山駅'},
+            {time:'11:03',dest:'岡山駅'}, {time:'11:22',dest:'岡山駅'}, {time:'11:42',dest:'岡山駅'},
+            {time:'12:02',dest:'岡山駅'}, {time:'12:22',dest:'岡山駅'}, {time:'12:42',dest:'岡山駅'},
+            {time:'13:03',dest:'岡山駅'}, {time:'13:23',dest:'岡山駅'}, {time:'13:43',dest:'岡山駅'},
+            {time:'14:03',dest:'岡山駅'}, {time:'14:23',dest:'岡山駅'}, {time:'14:43',dest:'岡山駅'},
+            {time:'15:04',dest:'岡山駅'}, {time:'15:24',dest:'岡山駅'}, {time:'15:44',dest:'岡山駅'},
+            {time:'16:04',dest:'岡山駅'}, {time:'16:24',dest:'岡山駅'}, {time:'17:05',dest:'岡山駅'},
+            {time:'17:26',dest:'岡山駅'}, {time:'19:23',dest:'岡山駅'}, {time:'19:58',dest:'岡山駅'},
+            {time:'20:23',dest:'岡山駅'}, {time:'21:27',dest:'岡山駅'}
+          ]
+        }
       },
       {
         id:'okaden-fj', name:'藤原団地方面', short:'藤原団地方面',
-        times:['07:30','08:00','08:30','09:00','09:30','10:00',
-               '10:30','11:00','11:30','12:00','12:30','13:00',
-               '13:30','14:00','14:30','15:00','15:30','16:00',
-               '16:30','17:00','17:30','18:00','18:30','19:00',
+        // ダイヤ分離していない場合は今まで通り配列で記述可能
+        times:['07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00',
+               '13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00',
                '19:40','20:20','21:00','21:40']
       }
     ]
@@ -413,28 +459,46 @@ const BUS_OPS = [
     dirs:[
       {
         id:'uno-hy', name:'駅前町・表町方面', short:'表町方面',
-        times:['07:15','07:35','07:55','08:15','08:35','08:55',
-               '09:15','09:35','09:55','10:15','10:35','10:55',
-               '11:15','11:35','11:55','12:15','12:35','12:55',
-               '13:15','13:35','13:55','14:15','14:35','14:55',
-               '15:15','15:35','15:55','16:15','16:35','16:55',
-               '17:15','17:35','17:55','18:15','18:35','18:55',
+        times:['07:15','07:35','07:55','08:15','08:35','08:55','09:15','09:35','09:55','10:15','10:35','10:55',
+               '11:15','11:35','11:55','12:15','12:35','12:55','13:15','13:35','13:55','14:15','14:35','14:55',
+               '15:15','15:35','15:55','16:15','16:35','16:55','17:15','17:35','17:55','18:15','18:35','18:55',
                '19:15','19:45','20:15','20:45','21:15','21:45']
       },
       {
         id:'uno-hg', name:'東岡山方面', short:'東岡山方面',
-        times:['07:20','07:50','08:20','08:50','09:20','09:50',
-               '10:20','10:50','11:20','11:50','12:20','12:50',
-               '13:20','13:50','14:20','14:50','15:20','15:50',
-               '16:20','16:50','17:20','17:50','18:20','18:50',
+        times:['07:20','07:50','08:20','08:50','09:20','09:50','10:20','10:50','11:20','11:50','12:20','12:50',
+               '13:20','13:50','14:20','14:50','15:20','15:50','16:20','16:50','17:20','17:50','18:20','18:50',
                '19:20','19:50','20:30','21:10','21:50']
       }
     ]
   }
 ];
 
+let CURRENT_BUS_OPS = FALLBACK_BUS_OPS;
+let isBusDataOnline = false;
+
 /* ============================================================
-   共通ユーティリティ
+   GTFS/APIデータ非同期取得関数 (今回はダミー)
+   ============================================================ */
+async function fetchBusData() {
+  try {
+    const response = await fetch('bus_timetable.json'); 
+    if (!response.ok) throw new Error('Network error');
+    const data = await response.json();
+    CURRENT_BUS_OPS = data;
+    isBusDataOnline = true;
+    document.getElementById('data-mode-badge').textContent = 'API取得中';
+    document.getElementById('data-mode-badge').style.background = 'var(--accent)';
+  } catch (error) {
+    CURRENT_BUS_OPS = FALLBACK_BUS_OPS;
+    isBusDataOnline = false;
+    document.getElementById('data-mode-badge').textContent = '静的データ';
+    document.getElementById('data-mode-badge').style.background = 'var(--ok)';
+  }
+}
+
+/* ============================================================
+   共通ユーティリティ（自動ダイヤ判定含む）
    ============================================================ */
 const now = () => new Date();
 
@@ -444,7 +508,26 @@ function toDate(hhmm) {
 }
 const minUntil = t => (toDate(t) - now()) / 60000;
 
-function nextDep(times, n=2) {
+// 今日のダイヤ種別を判定（'weekday', 'saturday', 'holiday'）
+function getScheduleType(d = now()) {
+  const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  
+  if (HOLIDAYS.includes(ymd) || d.getDay() === 0) return 'holiday';
+  if (d.getDay() === 6) return 'saturday';
+  return 'weekday';
+}
+
+// ダイヤ情報から今日の時刻配列を抽出する
+function getTimesArray(timesData) {
+  // すでに配列ならそのまま（従来の書き方）
+  if (Array.isArray(timesData)) return timesData;
+  // オブジェクトなら曜日で出し分け
+  const type = getScheduleType();
+  return timesData[type] || [];
+}
+
+function nextDep(timesData, n=2) {
+  const times = getTimesArray(timesData);
   return times
     .map(x => typeof x==='string' ? {time:x,dest:null,min:minUntil(x)} : {time:x.time,dest:x.dest,min:minUntil(x.time)})
     .filter(x => x.min > -1)
@@ -454,7 +537,6 @@ function nextDep(times, n=2) {
 
 function status(min, walk) {
   const hurry  = typeof walk==='object' ? walk.hurry  : walk;
-  const normal = typeof walk==='object' ? walk.normal : walk;
   if (min<0)              return {lbl:'発車済',    sc:'s-gone',  cc:'cd-gone'};
   if (min-hurry >= 5)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
   if (min-hurry >= 0)     return {lbl:'急げばOK',  sc:'s-hurry', cc:'cd-hurry'};
@@ -483,7 +565,7 @@ function depRow(dep, def, walk, key, i) {
 }
 
 /* ============================================================
-   電車グリッド生成
+   UI生成
    ============================================================ */
 function buildTrain() {
   const g = document.getElementById('train-grid');
@@ -509,18 +591,13 @@ function buildTrain() {
   });
 }
 
-/* ============================================================
-   バスUI生成 (見出しを外に出した新構造)
-   ============================================================ */
 function buildBus() {
   const sec = document.getElementById('bus-section');
   sec.innerHTML = '';
-  BUS_OPS.forEach(op => {
-    // 1事業者分のラッパー
+  CURRENT_BUS_OPS.forEach(op => {
     const wrapper = document.createElement('div');
     wrapper.className = 'col-section';
     
-    // 行先方向（左右）のHTML組み立て
     const dirsHtml = op.dirs.map(dir => {
       const nexts = nextDep(dir.times, 2);
       let rows = '';
@@ -532,7 +609,6 @@ function buildBus() {
       return `<div class="op-dir"><div class="op-dir-hd">${dir.name}</div>${rows}</div>`;
     }).join('');
     
-    // 見出し行を上に配置し、その下にカードを配置
     wrapper.innerHTML = `
       <div class="sec-title-row">
         <span class="sec-title">${op.name}</span>
@@ -561,7 +637,7 @@ function updateCD() {
       bd.textContent=s.lbl;          bd.className=`d-badge ${s.sc}`;
     });
   });
-  BUS_OPS.forEach(op => {
+  CURRENT_BUS_OPS.forEach(op => {
     op.dirs.forEach(dir => {
       nextDep(dir.times,2).forEach((d,i) => {
         const cd=document.getElementById(`bs-${dir.id}-cd-${i}`);
@@ -577,30 +653,35 @@ function updateCD() {
 }
 
 /* ============================================================
-   時計
+   時計とカレンダー・バッジ更新
    ============================================================ */
 function updateClock() {
   const n=now(), p=x=>String(x).padStart(2,'0');
   document.getElementById('clock').textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
   const w=['日','月','火','水','木','金','土'];
   document.getElementById('hdr-date').textContent=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日（${w[n.getDay()]}）`;
+
+  // 現在適用されているダイヤのバッジ表示
+  const schedMap = { 'weekday': '平日ダイヤ', 'saturday': '土曜ダイヤ', 'holiday': '休日ダイヤ' };
+  document.getElementById('sched-badge').textContent = schedMap[getScheduleType(n)];
 }
 
 /* ============================================================
    フル更新（1分）
    ============================================================ */
-function fullUpdate() {
+async function fullUpdate() {
+  await fetchBusData();
   buildTrain(); buildBus();
   const n=now(), p=x=>String(x).padStart(2,'0');
-  document.getElementById('hdr-badge').textContent=`・更新 ${p(n.getHours())}:${p(n.getMinutes())}`;
+  document.getElementById('update-time-badge').textContent=`・更新 ${p(n.getHours())}:${p(n.getMinutes())}`;
 }
 
 /* ============================================================
    初期化
    ============================================================ */
-(function(){
+(async function(){
   updateClock();
-  fullUpdate();
+  await fullUpdate();
   setInterval(updateClock, 1000);
   setInterval(updateCD,    10000);
   setInterval(fullUpdate,  60000);
