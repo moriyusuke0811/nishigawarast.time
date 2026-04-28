@@ -298,39 +298,22 @@ html, body {
    ============================================================ */
 const HOLIDAYS = [
   '2026-01-01', // 元日
-
   '2026-01-12', // 成人の日
-
   '2026-02-11', // 建国記念の日
-
   '2026-02-23', // 天皇誕生日  
-
   '2026-03-20', // 春分の日  
-
   '2026-04-29', // 昭和の日  
-
   '2026-05-03', // 憲法記念日  
-
   '2026-05-04', // みどりの日  
-
   '2026-05-05', // こどもの日  
-
   '2026-05-06', // 振替休日  
-
   '2026-07-20', // 海の日  
-
   '2026-08-11', // 山の日  
-
   '2026-09-21', // 敬老の日  
-
   '2026-09-22', // 国民の休日  
-
   '2026-09-23', // 秋分の日  
-
   '2026-10-12', // スポーツの日  
-
   '2026-11-03', // 文化の日  
-
   '2026-11-23', // 勤労感謝の日
 ];
 
@@ -378,17 +361,15 @@ const TRAIN_SANYO_DOWN = [
 const TRAIN_LINES = [
   {
     id: 'sanyo-down',
-    // 複数のバッジを表示するための配列に変更
     badges: [
-      { badge:'W', bg:'#F5A200' }, // 山陽線
-      { badge:'V', bg:'#46944C' }  // 伯備線
+      { badge:'W', bg:'#F5A200' },
+      { badge:'V', bg:'#46944C' } 
     ],
     name: '山陽線下り',
     def: '岡山・福山・新見方面',
-    // スプレッド構文で2つの配列を結合
     times: [...TRAIN_SANYO_DOWN, ...TRAIN_HAKUBI],
-    limit: 4,     // 4件表示
-    spanRow: 2    // 左側の行を2つ分ぶち抜く指定
+    limit: 4,
+    spanRow: 2
   },
   {
     id: 'sanyo-up',
@@ -686,7 +667,7 @@ function status(min, walk) {
   if (min-hurry >= 6)     return {lbl:'余裕を持って行こう',  sc:'s-ok',    cc:'cd-hurry'  };
   if (min-hurry >= 2)     return {lbl:'まだ行けます',  sc:'s-ok',    cc:'cd-hurry'  };
   if (min-hurry >= 0)     return {lbl:'おすすめはしません',  sc:'s-hurry', cc:'cd-veryhurry'};
-  return                         {lbl:'厳しい...',    sc:'s-tight', cc:'-gone'};
+  return                         {lbl:'厳しい...',    sc:'s-tight', cc:'cd-gone'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
@@ -696,7 +677,10 @@ function depRow(dep, def, walk, key, i) {
   const s   = status(dep.min, walk);
   const lbl = dep.dest ? `${dep.dest} 行き` : def;
   const hurry = typeof walk==='object' ? walk.hurry : walk;
-  const bl  = (dep.min>=0 && dep.min<hurry) ? ' blink' : '';
+  
+  const margin = dep.min - hurry;
+  const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+  
   return `
     <div class="d-row">
       <div class="d-info">
@@ -717,7 +701,6 @@ function buildTrain() {
   const g = document.getElementById('train-grid');
   g.innerHTML = '';
   TRAIN_LINES.forEach(line => {
-    // データ内で指定された上限（今回は4または2）を取得
     const limit = line.limit || 2;
     const nexts = nextDep(line.times, limit);
     let rows = '<div class="d-list">';
@@ -728,7 +711,6 @@ function buildTrain() {
     }
     rows += '</div>';
     
-    // 複数のバッジHTMLを組み立て
     let badgesHtml = '';
     if (line.badges) {
       line.badges.forEach(b => {
@@ -739,7 +721,6 @@ function buildTrain() {
     const c = document.createElement('div');
     c.className = 'r-card';
     c.id = `tr-${line.id}`;
-    // spanRow指定があればgrid-rowにセット
     if (line.spanRow) c.style.gridRow = `span ${line.spanRow}`;
     
     c.innerHTML = `
@@ -793,7 +774,10 @@ function updateCD() {
       const bd=document.getElementById(`tr-${line.id}-bd-${i}`);
       if(!cd||!bd) return;
       const s=status(d.min,WALK.train);
-      const bl=(d.min>=0&&d.min<WALK.train.hurry)?' blink':'';
+      
+      const margin = d.min - WALK.train.hurry;
+      const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+      
       cd.textContent=fmtMin(d.min); cd.className=`d-cd ${s.cc}${bl}`;
       bd.textContent=s.lbl;          bd.className=`d-badge ${s.sc}`;
     });
@@ -805,7 +789,11 @@ function updateCD() {
         const bd=document.getElementById(`bs-${dir.id}-bd-${i}`);
         if(!cd||!bd) return;
         const s=status(d.min,op.walk);
-        const bl=(d.min>=0&&d.min<op.walk.hurry)?' blink':'';
+        
+        const hurry = typeof op.walk==='object' ? op.walk.hurry : op.walk;
+        const margin = d.min - hurry;
+        const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+        
         cd.textContent=fmtMin(d.min); cd.className=`d-cd ${s.cc}${bl}`;
         bd.textContent=s.lbl;          bd.className=`d-badge ${s.sc}`;
       });
