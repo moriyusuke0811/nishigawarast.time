@@ -617,13 +617,13 @@ async function fetchBusData() {
     const data = await response.json();
     CURRENT_BUS_OPS = data;
     isBusDataOnline = true;
-    document.getElementById('data-mode-badge').textContent = "情報取得中';
+    document.getElementById('data-mode-badge').textContent = 'API取得中';
     document.getElementById('data-mode-badge').style.background = 'var(--accent)';
   } catch (error) {
     CURRENT_BUS_OPS = FALLBACK_BUS_OPS;
     isBusDataOnline = false;
-    document.getElementById('data-mode-badge').textContent = 'オフライン';
-    document.getElementById('data-mode-badge').style.background = 'var(--gone)';
+    document.getElementById('data-mode-badge').textContent = '静的データ';
+    document.getElementById('data-mode-badge').style.background = 'var(--ok)';
   }
 }
 
