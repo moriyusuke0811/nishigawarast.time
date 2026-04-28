@@ -71,7 +71,7 @@ html, body {
 #hdr-date  { font-size:.85rem; color:#fff; }
 #hdr-badge { font-size:.72rem; color:#fff; display:flex; gap:6px; align-items:center; }
 
-.badge-mode { background:var(--gone); color:#000; padding:1px 6px; border-radius:10px; font-weight:bold; }
+.badge-mode { background:var(--ok); color:#000; padding:1px 6px; border-radius:10px; font-weight:bold; }
 .badge-sched { background:rgba(255,255,255,0.2); color:#fff; padding:1px 6px; border-radius:10px; font-weight:bold; }
 
 /* ---- MAIN 3-col ---- */
@@ -104,6 +104,7 @@ html, body {
   flex:1; min-height:0;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr; /* 2行の均等グリッドを指定 */
   gap: 8px;
   background: var(--surf);
   padding: 10px;
@@ -133,7 +134,7 @@ html, body {
   font-size:1rem; font-weight:900; color:#fff;
   flex-shrink:0;
 }
-.r-name { font-size:1rem; font-weight:700; }
+.r-name { font-size:1.1rem; font-weight:900; letter-spacing:0.02em; }
 
 .d-list { display:flex; flex-direction:column; gap:4px; flex:1; min-height:0; color: #fff;}
 
@@ -231,7 +232,7 @@ html, body {
       <div id="hdr-date"></div>
       <div id="hdr-badge">
         <span id="sched-badge" class="badge-sched">--ダイヤ</span>
-        <span id="data-mode-badge" class="badge-mode">オフライン</span>
+        <span id="data-mode-badge" class="badge-mode">静的データ</span>
         <span id="update-time-badge">・更新中</span>
       </div>
     </div>
@@ -293,45 +294,14 @@ html, body {
 
 /* ============================================================
    設定（祝日・休校日リスト）
-   形式: 'YYYY-MM-DD'
    ============================================================ */
 const HOLIDAYS = [
-  '2026-01-01', // 元日
-
-'2026-01-12', // 成人の日
-
-'2026-02-11', // 建国記念の日
-
-'2026-02-23', // 天皇誕生日
-
-'2026-03-20', // 春分の日
-
-'2026-04-29', // 昭和の日
-
-'2026-05-03', // 憲法記念日
-
-'2026-05-04', // みどりの日
-
-'2026-05-05', // こどもの日
-
-'2026-05-06', // 振替休日
-
-'2026-07-20', // 海の日
-
-'2026-08-11', // 山の日
-
-'2026-09-21', // 敬老の日
-
-'2026-09-22', // 国民の休日
-
-'2026-09-23', // 秋分の日
-
-'2026-10-12', // スポーツの日
-
-'2026-11-03', // 文化の日
-
-'2026-11-23', // 勤労感謝の日
-  // ※振替休日追加
+  '2024-09-16', // 敬老の日
+  '2024-09-22', // 秋分の日
+  '2024-09-23', // 振替休日
+  '2024-10-14', // スポーツの日
+  '2024-11-03', // 文化の日
+  '2024-11-04'  // 振替休日
 ];
 
 const WALK = {
@@ -340,24 +310,83 @@ const WALK = {
 };
 
 /* ============================================================
-   電車時刻表（静的データ）
+   電車時刻表（統合・静的データ）
    ============================================================ */
+// 伯備線と山陽線下りのデータを定数で定義
+const TRAIN_HAKUBI = [
+  {time:'07:19',dest:'新見'},    {time:'09:04',dest:'新見'},
+  {time:'11:12',dest:'新見'},    {time:'12:12',dest:'新見'},
+  {time:'12:57',dest:'備中高梁'},{time:'13:27',dest:'備中高梁'},
+  {time:'14:31',dest:'備中高梁'},{time:'15:59',dest:'新見'},
+  {time:'16:27',dest:'備中高梁'},{time:'17:36',dest:'新見'},
+  {time:'18:35',dest:'新見'},    {time:'18:58',dest:'備中高梁'},
+  {time:'20:14',dest:'備中高梁'},{time:'21:04',dest:'新見'}
+];
+
+const TRAIN_SANYO_DOWN = [
+  {time:'05:48',dest:'岡山'},  {time:'06:06',dest:'糸崎'},  {time:'06:29',dest:'岡山'},
+  {time:'06:48',dest:'岡山'},  {time:'07:07',dest:'三原'},  {time:'07:44',dest:'岡山'},
+  {time:'07:50',dest:'福山'},  {time:'07:58',dest:'岡山'},  {time:'08:25',dest:'岡山'},
+  {time:'08:31',dest:'三原'},  {time:'08:36',dest:'岡山'},  {time:'08:50',dest:'岡山'},
+  {time:'09:25',dest:'岡山'},  {time:'09:34',dest:'岡山'},  {time:'09:40',dest:'岡山'},
+  {time:'10:03',dest:'福山'},  {time:'10:26',dest:'岡山'},  {time:'10:34',dest:'岡山'},
+  {time:'10:51',dest:'三原'},  {time:'11:29',dest:'岡山'},  {time:'11:34',dest:'三原'},
+  {time:'11:59',dest:'福山'},  {time:'12:26',dest:'岡山'},  {time:'12:35',dest:'岡山'},
+  {time:'13:02',dest:'岡山'},  {time:'13:33',dest:'岡山'},  {time:'13:52',dest:'金光'},
+  {time:'13:57',dest:'岡山'},  {time:'14:35',dest:'岡山'},  {time:'14:58',dest:'糸崎'},
+  {time:'15:05',dest:'岡山'},  {time:'15:27',dest:'三原'},  {time:'15:32',dest:'岡山'},
+  {time:'15:54',dest:'府中'},  {time:'16:33',dest:'岡山'},  {time:'16:52',dest:'岡山'},
+  {time:'16:59',dest:'岡山'},  {time:'17:25',dest:'岡山'},  {time:'18:00',dest:'岡山'},
+  {time:'18:04',dest:'糸崎'},  {time:'18:23',dest:'岡山'},  {time:'18:51',dest:'岡山'},
+  {time:'19:16',dest:'糸崎'},  {time:'19:34',dest:'糸崎'},  {time:'19:44',dest:'岡山'},
+  {time:'19:54',dest:'糸崎'},  {time:'20:06',dest:'岡山'},  {time:'20:27',dest:'岡山'},
+  {time:'20:32',dest:'岡山'},  {time:'21:10',dest:'岡山'},  {time:'21:34',dest:'岡山'},
+  {time:'21:41',dest:'岡山'},  {time:'21:57',dest:'岡山'},  {time:'22:02',dest:'岡山'},
+  {time:'22:38',dest:'岡山'},  {time:'23:05',dest:'岡山'},  {time:'23:26',dest:'岡山'}
+];
+
 const TRAIN_LINES = [
   {
-    id:'hakubi', badge:'V', bg:'#46944C', name:'伯備線方面', def:'総社・新見方面',
-    times:[
-      {time:'07:19',dest:'新見'},    {time:'09:04',dest:'新見'},
-      {time:'11:12',dest:'新見'},    {time:'12:12',dest:'新見'},
-      {time:'12:57',dest:'備中高梁'},{time:'13:27',dest:'備中高梁'},
-      {time:'14:31',dest:'備中高梁'},{time:'15:59',dest:'新見'},
-      {time:'16:27',dest:'備中高梁'},{time:'17:36',dest:'新見'},
-      {time:'18:35',dest:'新見'},    {time:'18:58',dest:'備中高梁'},
-      {time:'20:14',dest:'備中高梁'},{time:'21:04',dest:'新見'}
-    ]
+    id: 'sanyo-down',
+    // 複数のバッジを表示するための配列に変更
+    badges: [
+      { badge:'S', bg:'#F5A200' }, // 山陽線
+      { badge:'V', bg:'#46944C' }  // 伯備線
+    ],
+    name: '山陽線下り',
+    def: '岡山・福山・新見方面',
+    // スプレッド構文で2つの配列を結合
+    times: [...TRAIN_SANYO_DOWN, ...TRAIN_HAKUBI],
+    limit: 4,     // 4件表示
+    spanRow: 2    // 左側の行を2つ分ぶち抜く指定
   },
   {
-    id:'ako', badge:'N', bg:'#EA5E60', name:'赤穂線方面', def:'東岡山・播州赤穂方面',
-    times:[
+    id: 'sanyo-up',
+    badges: [ { badge:'S', bg:'#C1D612' } ],
+    name: '山陽線上り',
+    def: '東岡山・瀬戸方面',
+    times: [
+      {time:'06:18',dest:'姫路'}, {time:'06:34',dest:'吉永'}, {time:'07:11',dest:'姫路'},
+      {time:'07:47',dest:'相生'}, {time:'08:13',dest:'相生'}, {time:'08:22',dest:'和気'},
+      {time:'09:22',dest:'相生'}, {time:'09:37',dest:'瀬戸'}, {time:'10:16',dest:'相生'},
+      {time:'10:51',dest:'瀬戸'}, {time:'11:16',dest:'相生'}, {time:'11:46',dest:'瀬戸'},
+      {time:'12:17',dest:'相生'}, {time:'12:58',dest:'瀬戸'}, {time:'13:14',dest:'相生'},
+      {time:'13:45',dest:'瀬戸'}, {time:'14:15',dest:'相生'}, {time:'14:48',dest:'和気'},
+      {time:'15:14',dest:'相生'}, {time:'15:45',dest:'相生'}, {time:'16:16',dest:'相生'},
+      {time:'16:48',dest:'姫路'}, {time:'17:13',dest:'姫路'}, {time:'17:39',dest:'吉永'},
+      {time:'18:07',dest:'姫路'}, {time:'18:36',dest:'三石'}, {time:'19:02',dest:'和気'},
+      {time:'19:20',dest:'姫路'}, {time:'20:02',dest:'姫路'}, {time:'20:32',dest:'姫路'},
+      {time:'20:53',dest:'瀬戸'}, {time:'21:13',dest:'姫路'}, {time:'21:53',dest:'姫路'},
+      {time:'22:28',dest:'三石'}, {time:'23:04',dest:'三石'}
+    ],
+    limit: 2
+  },
+  {
+    id: 'ako',
+    badges: [ { badge:'N', bg:'#EA5E60' } ],
+    name: '赤穂線方面',
+    def: '東岡山・播州赤穂方面',
+    times: [
       {time:'05:17',dest:'播州赤穂'},{time:'05:59',dest:'播州赤穂'},
       {time:'06:25',dest:'播州赤穂'},{time:'07:30',dest:'播州赤穂'},
       {time:'07:42',dest:'西大寺'},  {time:'07:55',dest:'長船'},
@@ -376,54 +405,13 @@ const TRAIN_LINES = [
       {time:'19:37',dest:'備前片上'},{time:'20:08',dest:'播州赤穂'},
       {time:'20:44',dest:'日生'},    {time:'21:26',dest:'播州赤穂'},
       {time:'22:08',dest:'長船'},    {time:'23:15',dest:'備前片上'}
-    ]
-  },
-  {
-    id:'sanyo-down', badge:'W', bg:'#F5A200', name:'山陽線下り', def:'岡山・福山方面',
-    times:[
-      {time:'05:48',dest:'岡山'},  {time:'06:06',dest:'糸崎'},  {time:'06:29',dest:'岡山'},
-      {time:'06:48',dest:'岡山'},  {time:'07:07',dest:'三原'},  {time:'07:44',dest:'岡山'},
-      {time:'07:50',dest:'福山'},  {time:'07:58',dest:'岡山'},  {time:'08:25',dest:'岡山'},
-      {time:'08:31',dest:'三原'},  {time:'08:36',dest:'岡山'},  {time:'08:50',dest:'岡山'},
-      {time:'09:25',dest:'岡山'},  {time:'09:34',dest:'岡山'},  {time:'09:40',dest:'岡山'},
-      {time:'10:03',dest:'福山'},  {time:'10:26',dest:'岡山'},  {time:'10:34',dest:'岡山'},
-      {time:'10:51',dest:'三原'},  {time:'11:29',dest:'岡山'},  {time:'11:34',dest:'三原'},
-      {time:'11:59',dest:'福山'},  {time:'12:26',dest:'岡山'},  {time:'12:35',dest:'岡山'},
-      {time:'13:02',dest:'岡山'},  {time:'13:33',dest:'岡山'},  {time:'13:52',dest:'金光'},
-      {time:'13:57',dest:'岡山'},  {time:'14:35',dest:'岡山'},  {time:'14:58',dest:'糸崎'},
-      {time:'15:05',dest:'岡山'},  {time:'15:27',dest:'三原'},  {time:'15:32',dest:'岡山'},
-      {time:'15:54',dest:'府中'},  {time:'16:33',dest:'岡山'},  {time:'16:52',dest:'岡山'},
-      {time:'16:59',dest:'岡山'},  {time:'17:25',dest:'岡山'},  {time:'18:00',dest:'岡山'},
-      {time:'18:04',dest:'糸崎'},  {time:'18:23',dest:'岡山'},  {time:'18:51',dest:'岡山'},
-      {time:'19:16',dest:'糸崎'},  {time:'19:34',dest:'糸崎'},  {time:'19:44',dest:'岡山'},
-      {time:'19:54',dest:'糸崎'},  {time:'20:06',dest:'岡山'},  {time:'20:27',dest:'岡山'},
-      {time:'20:32',dest:'岡山'},  {time:'21:10',dest:'岡山'},  {time:'21:34',dest:'岡山'},
-      {time:'21:41',dest:'岡山'},  {time:'21:57',dest:'岡山'},  {time:'22:02',dest:'岡山'},
-      {time:'22:38',dest:'岡山'},  {time:'23:05',dest:'岡山'},  {time:'23:26',dest:'岡山'}
-    ]
-  },
-  {
-    id:'sanyo-up', badge:'S', bg:'#C1D612', name:'山陽線上り', def:'東岡山・瀬戸方面',
-    times:[
-      {time:'06:18',dest:'姫路'}, {time:'06:34',dest:'吉永'}, {time:'07:11',dest:'姫路'},
-      {time:'07:47',dest:'相生'}, {time:'08:13',dest:'相生'}, {time:'08:22',dest:'和気'},
-      {time:'09:22',dest:'相生'}, {time:'09:37',dest:'瀬戸'}, {time:'10:16',dest:'相生'},
-      {time:'10:51',dest:'瀬戸'}, {time:'11:16',dest:'相生'}, {time:'11:46',dest:'瀬戸'},
-      {time:'12:17',dest:'相生'}, {time:'12:58',dest:'瀬戸'}, {time:'13:14',dest:'相生'},
-      {time:'13:45',dest:'瀬戸'}, {time:'14:15',dest:'相生'}, {time:'14:48',dest:'和気'},
-      {time:'15:14',dest:'相生'}, {time:'15:45',dest:'相生'}, {time:'16:16',dest:'相生'},
-      {time:'16:48',dest:'姫路'}, {time:'17:13',dest:'姫路'}, {time:'17:39',dest:'吉永'},
-      {time:'18:07',dest:'姫路'}, {time:'18:36',dest:'三石'}, {time:'19:02',dest:'和気'},
-      {time:'19:20',dest:'姫路'}, {time:'20:02',dest:'姫路'}, {time:'20:32',dest:'姫路'},
-      {time:'20:53',dest:'瀬戸'}, {time:'21:13',dest:'姫路'}, {time:'21:53',dest:'姫路'},
-      {time:'22:28',dest:'三石'}, {time:'23:04',dest:'三石'}
-    ]
+    ],
+    limit: 2
   }
 ];
 
 /* ============================================================
    バス時刻表（静的フォールバックデータ）
-   曜日によってダイヤを自動で切り替えます
    ============================================================ */
 const FALLBACK_BUS_OPS = [
   {
@@ -431,7 +419,6 @@ const FALLBACK_BUS_OPS = [
     dirs:[
       {
         id:'okaden-ok', name:'天満屋・岡山駅方面', short:'岡山駅方面',
-        // 曜日ごとに配列を分ける
         times: {
           weekday: [
             {time:'06:54',dest:'岡山駅'}, {time:'07:22',dest:'岡山駅'}, {time:'08:02',dest:'岡山駅'},
@@ -475,21 +462,27 @@ const FALLBACK_BUS_OPS = [
       },
       {
         id:'okaden-fj', name:'藤原団地方面', short:'藤原団地方面',
-        // ダイヤ分離していない場合は今まで通り配列で記述可能
-        times:[]
+        times:['07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00',
+               '13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00',
+               '19:40','20:20','21:00','21:40']
       }
     ]
   },
   {
-    id:'uno', name:'宇野バス【中央警察署前】', stop:'徒歩：10分（信号注意）', walk:WALK.bus,
+    id:'uno', name:'宇野バス【中央警察署前】', stop:'徒歩：5分（信号注意）', walk:WALK.bus,
     dirs:[
       {
         id:'uno-hy', name:'駅前町・表町方面', short:'表町方面',
-        times:[]
+        times:['07:15','07:35','07:55','08:15','08:35','08:55','09:15','09:35','09:55','10:15','10:35','10:55',
+               '11:15','11:35','11:55','12:15','12:35','12:55','13:15','13:35','13:55','14:15','14:35','14:55',
+               '15:15','15:35','15:55','16:15','16:35','16:55','17:15','17:35','17:55','18:15','18:35','18:55',
+               '19:15','19:45','20:15','20:45','21:15','21:45']
       },
       {
         id:'uno-hg', name:'東岡山方面', short:'東岡山方面',
-        times:[]
+        times:['07:20','07:50','08:20','08:50','09:20','09:50','10:20','10:50','11:20','11:50','12:20','12:50',
+               '13:20','13:50','14:20','14:50','15:20','15:50','16:20','16:50','17:20','17:50','18:20','18:50',
+               '19:20','19:50','20:30','21:10','21:50']
       }
     ]
   }
@@ -529,20 +522,15 @@ function toDate(hhmm) {
 }
 const minUntil = t => (toDate(t) - now()) / 60000;
 
-// 今日のダイヤ種別を判定（'weekday', 'saturday', 'holiday'）
 function getScheduleType(d = now()) {
   const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  
   if (HOLIDAYS.includes(ymd) || d.getDay() === 0) return 'holiday';
   if (d.getDay() === 6) return 'saturday';
   return 'weekday';
 }
 
-// ダイヤ情報から今日の時刻配列を抽出する
 function getTimesArray(timesData) {
-  // すでに配列ならそのまま（従来の書き方）
   if (Array.isArray(timesData)) return timesData;
-  // オブジェクトなら曜日で出し分け
   const type = getScheduleType();
   return timesData[type] || [];
 }
@@ -560,9 +548,8 @@ function status(min, walk) {
   const hurry  = typeof walk==='object' ? walk.hurry  : walk;
   if (min<0)              return {lbl:'発車済',    sc:'s-gone',  cc:'cd-gone'};
   if (min-hurry >= 5)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
-  if (min-hurry >= 2)     return {lbl:'急げばOK',  sc:'s-hurry', cc:'cd-hurry'};
-  if (min-hurry >= 0)     return {lbl:'急げ！',  sc:'s-hurry', cc:'cd-hurry'};
-  return                         {lbl:'絶望的',    sc:'s-tight', cc:'cd-tight'};
+  if (min-hurry >= 0)     return {lbl:'急げばOK',  sc:'s-hurry', cc:'cd-hurry'};
+  return                         {lbl:'厳しい',    sc:'s-tight', cc:'cd-tight'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
@@ -593,7 +580,9 @@ function buildTrain() {
   const g = document.getElementById('train-grid');
   g.innerHTML = '';
   TRAIN_LINES.forEach(line => {
-    const nexts = nextDep(line.times, 2);
+    // データ内で指定された上限（今回は4または2）を取得
+    const limit = line.limit || 2;
+    const nexts = nextDep(line.times, limit);
     let rows = '<div class="d-list">';
     if (!nexts.length) {
       rows += `<div style="color:var(--muted);font-size:.9rem;padding:6px 0">本日の運行終了</div>`;
@@ -601,12 +590,24 @@ function buildTrain() {
       nexts.forEach((d,i) => { rows += depRow(d, line.def, WALK.train, `tr-${line.id}`, i); });
     }
     rows += '</div>';
+    
+    // 複数のバッジHTMLを組み立て
+    let badgesHtml = '';
+    if (line.badges) {
+      line.badges.forEach(b => {
+        badgesHtml += `<div class="r-badge" style="background:${b.bg}">${b.badge}</div>`;
+      });
+    }
+
     const c = document.createElement('div');
     c.className = 'r-card';
     c.id = `tr-${line.id}`;
+    // spanRow指定があればgrid-rowにセット
+    if (line.spanRow) c.style.gridRow = `span ${line.spanRow}`;
+    
     c.innerHTML = `
       <div class="r-head">
-        <div class="r-badge" style="background:${line.bg}">${line.badge}</div>
+        <div style="display:flex; gap:4px;">${badgesHtml}</div>
         <div class="r-name">${line.name}</div>
       </div>${rows}`;
     g.appendChild(c);
@@ -649,7 +650,8 @@ function buildBus() {
    ============================================================ */
 function updateCD() {
   TRAIN_LINES.forEach(line => {
-    nextDep(line.times,2).forEach((d,i) => {
+    const limit = line.limit || 2;
+    nextDep(line.times, limit).forEach((d,i) => {
       const cd=document.getElementById(`tr-${line.id}-cd-${i}`);
       const bd=document.getElementById(`tr-${line.id}-bd-${i}`);
       if(!cd||!bd) return;
@@ -683,7 +685,6 @@ function updateClock() {
   const w=['日','月','火','水','木','金','土'];
   document.getElementById('hdr-date').textContent=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日（${w[n.getDay()]}）`;
 
-  // 現在適用されているダイヤのバッジ表示
   const schedMap = { 'weekday': '平日ダイヤ', 'saturday': '土曜ダイヤ', 'holiday': '休日ダイヤ' };
   document.getElementById('sched-badge').textContent = schedMap[getScheduleType(n)];
 }
