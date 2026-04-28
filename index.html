@@ -19,6 +19,7 @@
   --accent:  #5bc8fa;
   --ok:      #4ade80;
   --hurry:   #fbbf24;
+  --veryhurry:#ff8400;
   --danger:  #f87171;
   --gone:    #64748b;
   --r: 10px;
@@ -680,10 +681,12 @@ function nextDep(timesData, n=2) {
 
 function status(min, walk) {
   const hurry  = typeof walk==='object' ? walk.hurry  : walk;
-  if (min<0)              return {lbl:'発車済',    sc:'s-gone',  cc:'cd-gone'};
-  if (min-hurry >= 5)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
-  if (min-hurry >= 0)     return {lbl:'急げばOK',  sc:'s-hurry', cc:'cd-hurry'};
-  return                         {lbl:'厳しい',    sc:'s-tight', cc:'cd-tight'};
+  if (min<0)              return {lbl:'諦めましょう',    sc:'s-gone',  cc:'cd-gone'};
+  if (min-hurry >= 8)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
+  if (min-hurry >= 6)     return {lbl:'余裕を持って行こう',  sc:'s-ok',    cc:'cd-hurry'  };
+  if (min-hurry >= 2)     return {lbl:'まだ行けます',  sc:'s-ok',    cc:'cd-hurry'  };
+  if (min-hurry >= 0)     return {lbl:'おすすめはしません',  sc:'s-hurry', cc:'cd-veryhurry'};
+  return                         {lbl:'厳しい...',    sc:'s-tight', cc:'-gone'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
