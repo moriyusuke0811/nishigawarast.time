@@ -672,7 +672,7 @@ function status(min, walk) {
   if (min-hurry >= 6)     return {lbl:'余裕を持って行こう',  sc:'s-care',    cc:'cd-care'  };
   if (min-hurry >= 2)     return {lbl:'まだ行けます',  sc:'s-hurry',    cc:'cd-hurry'  };
   if (min-hurry >= 0)     return {lbl:'おすすめはしません',  sc:'s-veryhurry', cc:'cd-veryhurry'};
-  return                         {lbl:'厳しい...',    sc:'s-gone', cc:'cd-gone'};
+  return                         {lbl:'厳しい...',    sc:'s-danger', cc:'cd-danger'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
