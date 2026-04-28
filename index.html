@@ -681,7 +681,7 @@ function depRow(dep, def, walk, key, i) {
   const hurry = typeof walk==='object' ? walk.hurry : walk;
   
   const margin = dep.min - hurry;
-  const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+  const bl = (margin >= 0 && margin < 8) ? ' blink' : '';
   
   return `
     <div class="d-row">
