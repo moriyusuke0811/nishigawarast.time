@@ -617,13 +617,13 @@ async function fetchBusData() {
     const data = await response.json();
     CURRENT_BUS_OPS = data;
     isBusDataOnline = true;
-    document.getElementById('data-mode-badge').textContent = 'API取得中';
+    document.getElementById('data-mode-badge').textContent = "情報取得中';
     document.getElementById('data-mode-badge').style.background = 'var(--accent)';
   } catch (error) {
     CURRENT_BUS_OPS = FALLBACK_BUS_OPS;
     isBusDataOnline = false;
-    document.getElementById('data-mode-badge').textContent = '静的データ';
-    document.getElementById('data-mode-badge').style.background = 'var(--ok)';
+    document.getElementById('data-mode-badge').textContent = 'オフライン';
+    document.getElementById('data-mode-badge').style.background = 'var(--gone)';
   }
 }
 
@@ -664,10 +664,10 @@ function status(min, walk) {
   const hurry  = typeof walk==='object' ? walk.hurry  : walk;
   if (min<0)              return {lbl:'諦めましょう',    sc:'s-gone',  cc:'cd-gone'};
   if (min-hurry >= 8)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
-  if (min-hurry >= 6)     return {lbl:'余裕を持って行こう',  sc:'s-ok',    cc:'cd-hurry'  };
-  if (min-hurry >= 2)     return {lbl:'まだ行けます',  sc:'s-ok',    cc:'cd-hurry'  };
-  if (min-hurry >= 0)     return {lbl:'おすすめはしません',  sc:'s-hurry', cc:'cd-veryhurry'};
-  return                         {lbl:'厳しい...',    sc:'s-tight', cc:'cd-gone'};
+  if (min-hurry >= 6)     return {lbl:'余裕を持って行こう',  sc:'s-hurry',    cc:'cd-hurry'  };
+  if (min-hurry >= 2)     return {lbl:'まだ行けます',  sc:'s-hurry',    cc:'cd-hurry'  };
+  if (min-hurry >= 0)     return {lbl:'おすすめはしません',  sc:'s-veryhurry', cc:'cd-veryhurry'};
+  return                         {lbl:'厳しい...',    sc:'s-gone', cc:'cd-gone'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
