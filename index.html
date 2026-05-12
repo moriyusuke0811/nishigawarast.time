@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.2.5/dist/protobuf.min.js"></script>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +18,7 @@
   --muted:   #7888b8;
   --accent:  #5bc8fa;
   --ok:      #4ade80;
-  --care: #a0de4a;
+  --care:    #a0de4a;
   --hurry:   #fbbf24;
   --veryhurry:#ff8400;
   --danger:  #f87171;
@@ -38,8 +37,7 @@ html {
 }
 
 /* ============================================================
-   DESKTOP (default) — 横長モニター向け
-   overflow:hidden で全体をビューポート内に収める
+   全体レイアウト
    ============================================================ */
 body {
   width: 100%;
@@ -49,7 +47,7 @@ body {
 
 #app {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto; /* ヘッダー / メイン / フッター */
   height: 100vh;
   padding: 10px 12px;
   gap: 8px;
@@ -70,7 +68,8 @@ body {
 }
 .h-center { display:flex; justify-content:center; }
 .h-pill {
-  background: #fff; color: var(--sozanblue);
+  background: #fff;
+  color: var(--sozanblue);
   border-radius: 14px; padding: 6px 32px;
   font-size: 3.0rem; font-weight: 900; letter-spacing: .12em;
   white-space: nowrap;
@@ -134,6 +133,21 @@ body {
   min-height: 0;
   border: 1px solid var(--r);
 }
+
+/* ---- 方面グループ用の白枠バッジ ---- */
+.r-group {
+  margin-bottom: 2px;
+}
+.r-group-label {
+  display: inline-block;
+  background: #fff;
+  color: var(--darkblue);
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
 .r-head {
   display:flex; align-items:center; gap:8px;
   padding-bottom:5px;
@@ -180,18 +194,19 @@ body {
 }
 
 /* Status colours */
-.s-ok    { background:rgba(74,222,128,.14); color:var(--ok);    border:1px solid rgba(74,222,128,.4); }
-.s-care  { background:rgba(128,222,74,.14);  color:var(--care);  border:1px solid rgba(128,222,74,.4); }
-.s-hurry { background:rgba(251,191,36,.14); color:var(--hurry); border:1px solid rgba(251,191,36,.4); }
+.s-ok        { background:rgba(74,222,128,.14); color:var(--ok); border:1px solid rgba(74,222,128,.4); }
+.s-care      { background:rgba(128,222,74,.14); color:var(--care); border:1px solid rgba(128,222,74,.4); }
+.s-hurry     { background:rgba(251,191,36,.14); color:var(--hurry); border:1px solid rgba(251,191,36,.4); }
 .s-veryhurry { background:rgba(251,125,36,.14); color:var(--hurry); border:1px solid rgba(251,158,36,.4); }
-.s-tight { background:rgba(248,113,113,.14);color:var(--danger);border:1px solid rgba(248,113,113,.4); }
-.s-gone  { background:rgba(100,116,139,.14);color:var(--gone);  border:1px solid rgba(100,116,139,.4); }
-.cd-ok    { color:var(--ok); }
-.cd-care  { color:var(--care); }
-.cd-hurry { color:var(--hurry); }
+.s-tight     { background:rgba(248,113,113,.14); color:var(--danger); border:1px solid rgba(248,113,113,.4); }
+.s-gone      { background:rgba(100,116,139,.14); color:var(--gone); border:1px solid rgba(100,116,139,.4); }
+
+.cd-ok        { color:var(--ok); }
+.cd-care      { color:var(--care); }
+.cd-hurry     { color:var(--hurry); }
 .cd-veryhurry { color:var(--veryhurry); }
-.cd-tight { color:var(--danger); }
-.cd-gone  { color:var(--gone); }
+.cd-tight     { color:var(--danger); }
+.cd-gone      { color:var(--gone); }
 
 /* ---- Bus section ---- */
 #bus-section {
@@ -233,67 +248,65 @@ body {
 .fare-price { font-size:1.4rem; font-weight:900; color:#fff; line-height:1.1; font-variant-numeric:tabular-nums; }
 .fare-note  { font-size:.65rem; color: #fff; }
 
+/* ---- Footer (Ticker & Disclaimer) ---- */
+#ftr {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 4px;
+}
+.ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--bdr);
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+.ticker-text {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: ticker-anim 30s linear infinite;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+@keyframes ticker-anim {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+.disclaimer {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: right;
+}
+
 /* Blink */
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
 .blink { animation: blink 1.1s ease-in-out infinite; }
 
-
 /* ============================================================
-   TABLET LANDSCAPE (1024px 以下)
+   レスポンシブ (省略)
    ============================================================ */
 @media (max-width: 1024px) {
   .h-festival { font-size: 2.4rem; }
   .h-pill     { font-size: 2.0rem; padding: 5px 20px; }
   #clock      { font-size: 2.2rem; }
-
-  #main {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-  }
-
-  /* 電車は2列占有 */
+  #main { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
   #train-section { grid-column: 1 / -1; }
-
-  /* 電車グリッドは4列に */
-  #train-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
-  }
-  #train-grid .r-card[style*="span"] {
-    grid-row: span 1 !important;
-  }
-
-  /* バスは左 */
+  #train-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; }
+  #train-grid .r-card[style*="span"] { grid-row: span 1 !important; }
   #bus-section { grid-column: 1; }
-
-  /* 右列は右 */
   .right-col { grid-column: 2; }
 }
 
-/* ============================================================
-   TABLET PORTRAIT / LARGE PHONE (768px 以下)
-   スクロール可能な縦1カラム
-   ============================================================ */
 @media (max-width: 768px) {
-  body {
-    height: auto;
-    overflow: auto;
-    overflow-x: hidden;
-  }
-  #app {
-    height: auto;
-    overflow: visible;
-    padding: 8px;
-    gap: 10px;
-  }
-
-  /* ヘッダー：縦並び */
-  #hdr {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    padding: 8px 10px;
-    gap: 6px;
-  }
+  body { height: auto; overflow: auto; overflow-x: hidden; }
+  #app { height: auto; overflow: visible; padding: 8px; gap: 10px; }
+  #hdr { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; padding: 8px 10px; gap: 6px; }
   .h-festival { font-size: 1.9rem; grid-row: 1; }
   .h-right    { grid-row: 1; align-items: flex-end; }
   .h-center   { grid-column: 1 / -1; grid-row: 2; }
@@ -301,50 +314,22 @@ body {
   #clock      { font-size: 1.8rem; }
   #hdr-date   { font-size: .75rem; }
   #hdr-badge  { font-size: .68rem; }
-
-  /* メイン：1カラム縦積み */
-  #main {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 12px;
-  }
-
+  #main { grid-template-columns: 1fr; grid-template-rows: auto; gap: 12px; }
   #train-section { grid-column: 1; }
   #bus-section   { grid-column: 1; }
   .right-col     { grid-column: 1; }
-
-  /* 電車グリッド：2カラム2行 */
-  #train-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    flex: none;
-    height: auto;
-  }
-  #train-grid .r-card[style*="span"] {
-    grid-row: span 1 !important;
-  }
-
-  /* バスのdir列：縦積み */
+  #train-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; flex: none; height: auto; }
+  #train-grid .r-card[style*="span"] { grid-row: span 1 !important; }
   .op-dirs { grid-template-columns: 1fr; }
   .op-block { flex: none; height: auto; }
   #bus-section { min-height: 0; gap: 10px; }
   .col-section { flex: none; }
-
-  /* 運賃欄を横並びに */
-  .fare-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .fare-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .right-col { gap: 10px; }
-
   .sec-title { font-size: 1.2rem; }
   .sec-meta  { font-size: .72rem; }
 }
 
-/* ============================================================
-   PHONE (480px 以下)
-   ============================================================ */
 @media (max-width: 480px) {
   #hdr { gap: 4px; padding: 6px 8px; }
   .h-festival { font-size: 1.5rem; }
@@ -352,45 +337,27 @@ body {
   #clock      { font-size: 1.5rem; }
   #hdr-date   { font-size: .65rem; }
   #hdr-badge  { font-size: .6rem; gap: 3px; }
-
-  /* 電車グリッド：1カラム縦積み */
-  #train-grid {
-    grid-template-columns: 1fr;
-    border-width: 2px;
-    padding: 8px;
-    gap: 6px;
-  }
-
+  #train-grid { grid-template-columns: 1fr; border-width: 2px; padding: 8px; gap: 6px; }
   .d-cd { font-size: 1.3rem !important; }
   .d-row:first-child .d-cd { font-size: 1.6rem !important; }
   .d-dest { font-size: .85rem !important; }
   .d-row:first-child .d-dest { font-size: .95rem !important; }
-
   .r-badge { width: 24px; height: 24px; font-size: .85rem; border-radius: 5px; }
   .r-name  { font-size: .95rem; }
-
-  /* 運賃：1カラムに戻す */
   .fare-box { grid-template-columns: 1fr; }
   .fare-price { font-size: 1.2rem; }
-
   .sec-title { font-size: 1.05rem; }
   .sec-meta  { font-size: .65rem; }
-
   .d-badge { font-size: .62rem; padding: 1px 6px; }
   .op-dir-hd { font-size: .78rem; }
-
   #app { padding: 6px; gap: 8px; }
   #main { gap: 10px; }
 }
 
-/* ============================================================
-   EXTRA SMALL PHONE (360px 以下)
-   ============================================================ */
 @media (max-width: 360px) {
   .h-festival { font-size: 1.25rem; }
   .h-pill     { font-size: 1.05rem; padding: 3px 12px; }
   #clock      { font-size: 1.3rem; }
-
   .r-name { font-size: .85rem; }
   .d-cd { font-size: 1.1rem !important; }
   .d-row:first-child .d-cd { font-size: 1.35rem !important; }
@@ -398,6 +365,7 @@ body {
 </style>
 </head>
 <body>
+
 <div id="app">
 
   <header id="hdr">
@@ -466,8 +434,19 @@ body {
         </div>
       </div>
     </div>
-
   </main>
+
+  <footer id="ftr">
+    <div class="ticker-wrap">
+      <div class="ticker-text" id="ticker-text">
+        【お知らせ】本日は松柏祭にご来場いただき誠にありがとうございます。直行バスは乗り場にて随時運行しております。
+      </div>
+    </div>
+    <div class="disclaimer">
+      ※本画面の表示時刻や到着予定は目安であり、実際の運行状況を保証するものではありません。交通状況をご確認の上、時間に余裕を持ったご移動をお願いいたします。
+    </div>
+  </footer>
+
 </div>
 
 <script>
@@ -489,7 +468,7 @@ const WALK = {
 };
 
 /* ============================================================
-   電車時刻表
+   電車・バス時刻表（静的フォールバックデータ）
    ============================================================ */
 const TRAIN_HAKUBI = [
   {time:'07:19',dest:'新見'},    {time:'09:04',dest:'新見'},
@@ -523,9 +502,10 @@ const TRAIN_SANYO_DOWN = [
   {time:'22:38',dest:'岡山'},  {time:'23:05',dest:'岡山'},  {time:'23:26',dest:'岡山'}
 ];
 
-const TRAIN_LINES = [
+const FALLBACK_TRAIN_LINES = [
   {
     id: 'sanyo-down',
+    groupLabel: '岡山駅方面', // 追加：路線上の白枠グループ表示
     badges: [
       { badge:'W', bg:'#F5A200' },
       { badge:'V', bg:'#46944C' }
@@ -538,6 +518,7 @@ const TRAIN_LINES = [
   },
   {
     id: 'sanyo-up',
+    groupLabel: '東岡山駅方面', // 追加：路線上の白枠グループ表示
     badges: [ { badge:'S', bg:'#C1D612' } ],
     name: '山陽線上り',
     def: '東岡山・瀬戸方面',
@@ -559,6 +540,7 @@ const TRAIN_LINES = [
   },
   {
     id: 'ako',
+    groupLabel: '東岡山駅方面', // 追加：路線上の白枠グループ表示
     badges: [ { badge:'N', bg:'#EA5E60' } ],
     name: '赤穂線方面',
     def: '東岡山・播州赤穂方面',
@@ -586,9 +568,6 @@ const TRAIN_LINES = [
   }
 ];
 
-/* ============================================================
-   バス時刻表（静的フォールバックデータ）
-   ============================================================ */
 const FALLBACK_BUS_OPS = [
   {
     id:'okaden', name:'岡電バス【浜本町】', stop:'徒歩：8分（信号注意）', walk:WALK.bus,
@@ -597,42 +576,42 @@ const FALLBACK_BUS_OPS = [
         id:'okaden-ok', name:'天満屋・岡山駅方面', short:'岡山駅方面',
         times: {
           weekday: [
-            {time:'06:54',dest:'岡山駅'},{time:'07:22',dest:'岡山駅'},{time:'08:02',dest:'岡山駅'},
-            {time:'08:27',dest:'岡山駅'},{time:'08:52',dest:'京山'},  {time:'09:17',dest:'岡山駅'},
-            {time:'09:41',dest:'岡山駅'},{time:'10:06',dest:'岡山駅'},{time:'10:36',dest:'岡山駅'},
-            {time:'11:06',dest:'岡山駅'},{time:'11:37',dest:'岡山駅'},{time:'12:07',dest:'岡山駅'},
-            {time:'12:37',dest:'岡山駅'},{time:'13:07',dest:'岡山駅'},{time:'13:37',dest:'岡山駅'},
-            {time:'14:07',dest:'岡山駅'},{time:'14:37',dest:'岡山駅'},{time:'15:07',dest:'岡山駅'},
-            {time:'15:32',dest:'岡山駅'},{time:'15:52',dest:'岡山駅'},{time:'16:12',dest:'岡山駅'},
-            {time:'16:32',dest:'岡山駅'},{time:'16:53',dest:'岡山駅'},{time:'17:14',dest:'岡山駅'},
-            {time:'17:35',dest:'岡山駅'},{time:'17:55',dest:'岡山駅'},{time:'18:16',dest:'岡山駅'},
-            {time:'18:36',dest:'岡山駅'},{time:'18:56',dest:'岡山駅'},{time:'19:15',dest:'岡山駅'},
-            {time:'19:33',dest:'岡山駅'},{time:'19:56',dest:'岡山駅'},{time:'20:27',dest:'岡山駅'},
+            {time:'06:54',dest:'岡山駅'}, {time:'07:22',dest:'岡山駅'}, {time:'08:02',dest:'岡山駅'},
+            {time:'08:27',dest:'岡山駅'}, {time:'08:52',dest:'京山'},   {time:'09:17',dest:'岡山駅'},
+            {time:'09:41',dest:'岡山駅'}, {time:'10:06',dest:'岡山駅'}, {time:'10:36',dest:'岡山駅'},
+            {time:'11:06',dest:'岡山駅'}, {time:'11:37',dest:'岡山駅'}, {time:'12:07',dest:'岡山駅'},
+            {time:'12:37',dest:'岡山駅'}, {time:'13:07',dest:'岡山駅'}, {time:'13:37',dest:'岡山駅'},
+            {time:'14:07',dest:'岡山駅'}, {time:'14:37',dest:'岡山駅'}, {time:'15:07',dest:'岡山駅'},
+            {time:'15:32',dest:'岡山駅'}, {time:'15:52',dest:'岡山駅'}, {time:'16:12',dest:'岡山駅'},
+            {time:'16:32',dest:'岡山駅'}, {time:'16:53',dest:'岡山駅'}, {time:'17:14',dest:'岡山駅'},
+            {time:'17:35',dest:'岡山駅'}, {time:'17:55',dest:'岡山駅'}, {time:'18:16',dest:'岡山駅'},
+            {time:'18:36',dest:'岡山駅'}, {time:'18:56',dest:'岡山駅'}, {time:'19:15',dest:'岡山駅'},
+            {time:'19:33',dest:'岡山駅'}, {time:'19:56',dest:'岡山駅'}, {time:'20:27',dest:'岡山駅'},
             {time:'21:26',dest:'岡山駅'}
           ],
           saturday: [
-            {time:'06:58',dest:'京山'},  {time:'09:16',dest:'岡山駅'},{time:'09:41',dest:'岡山駅'},
-            {time:'10:03',dest:'岡山駅'},{time:'10:23',dest:'岡山駅'},{time:'10:43',dest:'岡山駅'},
-            {time:'11:03',dest:'岡山駅'},{time:'11:22',dest:'岡山駅'},{time:'11:42',dest:'岡山駅'},
-            {time:'12:02',dest:'岡山駅'},{time:'12:22',dest:'岡山駅'},{time:'12:42',dest:'岡山駅'},
-            {time:'13:03',dest:'岡山駅'},{time:'13:23',dest:'岡山駅'},{time:'13:43',dest:'岡山駅'},
-            {time:'14:03',dest:'岡山駅'},{time:'14:23',dest:'岡山駅'},{time:'14:43',dest:'岡山駅'},
-            {time:'15:04',dest:'岡山駅'},{time:'15:24',dest:'岡山駅'},{time:'15:44',dest:'岡山駅'},
-            {time:'16:04',dest:'岡山駅'},{time:'16:24',dest:'岡山駅'},{time:'17:05',dest:'岡山駅'},
-            {time:'17:26',dest:'岡山駅'},{time:'19:23',dest:'岡山駅'},{time:'19:58',dest:'岡山駅'},
-            {time:'20:23',dest:'岡山駅'},{time:'21:27',dest:'岡山駅'}
+            {time:'06:58',dest:'京山'},   {time:'09:16',dest:'岡山駅'}, {time:'09:41',dest:'岡山駅'},
+            {time:'10:03',dest:'岡山駅'}, {time:'10:23',dest:'岡山駅'}, {time:'10:43',dest:'岡山駅'},
+            {time:'11:03',dest:'岡山駅'}, {time:'11:22',dest:'岡山駅'}, {time:'11:42',dest:'岡山駅'},
+            {time:'12:02',dest:'岡山駅'}, {time:'12:22',dest:'岡山駅'}, {time:'12:42',dest:'岡山駅'},
+            {time:'13:03',dest:'岡山駅'}, {time:'13:23',dest:'岡山駅'}, {time:'13:43',dest:'岡山駅'},
+            {time:'14:03',dest:'岡山駅'}, {time:'14:23',dest:'岡山駅'}, {time:'14:43',dest:'岡山駅'},
+            {time:'15:04',dest:'岡山駅'}, {time:'15:24',dest:'岡山駅'}, {time:'15:44',dest:'岡山駅'},
+            {time:'16:04',dest:'岡山駅'}, {time:'16:24',dest:'岡山駅'}, {time:'17:05',dest:'岡山駅'},
+            {time:'17:26',dest:'岡山駅'}, {time:'19:23',dest:'岡山駅'}, {time:'19:58',dest:'岡山駅'},
+            {time:'20:23',dest:'岡山駅'}, {time:'21:27',dest:'岡山駅'}
           ],
           holiday: [
-            {time:'06:58',dest:'京山'},  {time:'09:16',dest:'岡山駅'},{time:'09:41',dest:'岡山駅'},
-            {time:'10:03',dest:'岡山駅'},{time:'10:23',dest:'岡山駅'},{time:'10:43',dest:'岡山駅'},
-            {time:'11:03',dest:'岡山駅'},{time:'11:22',dest:'岡山駅'},{time:'11:42',dest:'岡山駅'},
-            {time:'12:02',dest:'岡山駅'},{time:'12:22',dest:'岡山駅'},{time:'12:42',dest:'岡山駅'},
-            {time:'13:03',dest:'岡山駅'},{time:'13:23',dest:'岡山駅'},{time:'13:43',dest:'岡山駅'},
-            {time:'14:03',dest:'岡山駅'},{time:'14:23',dest:'岡山駅'},{time:'14:43',dest:'岡山駅'},
-            {time:'15:04',dest:'岡山駅'},{time:'15:24',dest:'岡山駅'},{time:'15:44',dest:'岡山駅'},
-            {time:'16:04',dest:'岡山駅'},{time:'16:24',dest:'岡山駅'},{time:'17:05',dest:'岡山駅'},
-            {time:'17:26',dest:'岡山駅'},{time:'19:23',dest:'岡山駅'},{time:'19:58',dest:'岡山駅'},
-            {time:'20:23',dest:'岡山駅'},{time:'21:27',dest:'岡山駅'}
+            {time:'06:58',dest:'京山'},   {time:'09:16',dest:'岡山駅'}, {time:'09:41',dest:'岡山駅'},
+            {time:'10:03',dest:'岡山駅'}, {time:'10:23',dest:'岡山駅'}, {time:'10:43',dest:'岡山駅'},
+            {time:'11:03',dest:'岡山駅'}, {time:'11:22',dest:'岡山駅'}, {time:'11:42',dest:'岡山駅'},
+            {time:'12:02',dest:'岡山駅'}, {time:'12:22',dest:'岡山駅'}, {time:'12:42',dest:'岡山駅'},
+            {time:'13:03',dest:'岡山駅'}, {time:'13:23',dest:'岡山駅'}, {time:'13:43',dest:'岡山駅'},
+            {time:'14:03',dest:'岡山駅'}, {time:'14:23',dest:'岡山駅'}, {time:'14:43',dest:'岡山駅'},
+            {time:'15:04',dest:'岡山駅'}, {time:'15:24',dest:'岡山駅'}, {time:'15:44',dest:'岡山駅'},
+            {time:'16:04',dest:'岡山駅'}, {time:'16:24',dest:'岡山駅'}, {time:'17:05',dest:'岡山駅'},
+            {time:'17:26',dest:'岡山駅'}, {time:'19:23',dest:'岡山駅'}, {time:'19:58',dest:'岡山駅'},
+            {time:'20:23',dest:'岡山駅'}, {time:'21:27',dest:'岡山駅'}
           ]
         }
       },
@@ -640,44 +619,44 @@ const FALLBACK_BUS_OPS = [
         id:'okaden-fj', name:'藤原団地方面', short:'藤原団地方面',
         times: {
           weekday: [
-            {time:'07:33',dest:'藤原団地'},{time:'07:58',dest:'藤原団地'},{time:'08:23',dest:'藤原団地'},
-            {time:'08:49',dest:'藤原団地'},{time:'09:14',dest:'藤原団地'},{time:'09:39',dest:'藤原団地'},
-            {time:'10:09',dest:'藤原団地'},{time:'10:39',dest:'藤原団地'},{time:'11:09',dest:'藤原団地'},
-            {time:'11:39',dest:'藤原団地'},{time:'12:09',dest:'藤原団地'},{time:'12:39',dest:'藤原団地'},
-            {time:'13:09',dest:'藤原団地'},{time:'13:39',dest:'藤原団地'},{time:'14:09',dest:'藤原団地'},
-            {time:'14:39',dest:'藤原団地'},{time:'15:04',dest:'藤原団地'},{time:'15:24',dest:'藤原団地'},
-            {time:'15:44',dest:'藤原団地'},{time:'16:04',dest:'藤原団地'},{time:'16:24',dest:'藤原団地'},
-            {time:'16:44',dest:'藤原団地'},{time:'17:04',dest:'藤原団地'},{time:'17:24',dest:'藤原団地'},
-            {time:'17:44',dest:'藤原団地'},{time:'18:04',dest:'藤原団地'},{time:'18:24',dest:'藤原団地'},
-            {time:'18:44',dest:'藤原団地'},{time:'19:04',dest:'藤原団地'},{time:'19:29',dest:'藤原団地'},
-            {time:'19:59',dest:'藤原団地'},{time:'20:58',dest:'藤原団地'}
+            {time:'07:33',dest:'藤原団地'}, {time:'07:58',dest:'藤原団地'}, {time:'08:23',dest:'藤原団地'},
+            {time:'08:49',dest:'藤原団地'}, {time:'09:14',dest:'藤原団地'}, {time:'09:39',dest:'藤原団地'},
+            {time:'10:09',dest:'藤原団地'}, {time:'10:39',dest:'藤原団地'}, {time:'11:09',dest:'藤原団地'},
+            {time:'11:39',dest:'藤原団地'}, {time:'12:09',dest:'藤原団地'}, {time:'12:39',dest:'藤原団地'},
+            {time:'13:09',dest:'藤原団地'}, {time:'13:39',dest:'藤原団地'}, {time:'14:09',dest:'藤原団地'},
+            {time:'14:39',dest:'藤原団地'}, {time:'15:04',dest:'藤原団地'}, {time:'15:24',dest:'藤原団地'},
+            {time:'15:44',dest:'藤原団地'}, {time:'16:04',dest:'藤原団地'}, {time:'16:24',dest:'藤原団地'},
+            {time:'16:44',dest:'藤原団地'}, {time:'17:04',dest:'藤原団地'}, {time:'17:24',dest:'藤原団地'},
+            {time:'17:44',dest:'藤原団地'}, {time:'18:04',dest:'藤原団地'}, {time:'18:24',dest:'藤原団地'},
+            {time:'18:44',dest:'藤原団地'}, {time:'19:04',dest:'藤原団地'}, {time:'19:29',dest:'藤原団地'},
+            {time:'19:59',dest:'藤原団地'}, {time:'20:58',dest:'藤原団地'}
           ],
           saturday: [
-            {time:'07:32',dest:'藤原団地'},{time:'08:23',dest:'藤原団地'},{time:'08:48',dest:'藤原団地'},
-            {time:'09:14',dest:'藤原団地'},{time:'09:36',dest:'藤原団地'},{time:'09:56',dest:'藤原団地'},
-            {time:'10:16',dest:'藤原団地'},{time:'10:36',dest:'藤原団地'},{time:'10:54',dest:'藤原団地'},
-            {time:'11:14',dest:'藤原団地'},{time:'11:34',dest:'藤原団地'},{time:'11:54',dest:'藤原団地'},
-            {time:'12:14',dest:'藤原団地'},{time:'12:34',dest:'藤原団地'},{time:'12:54',dest:'藤原団地'},
-            {time:'13:14',dest:'藤原団地'},{time:'13:34',dest:'藤原団地'},{time:'13:54',dest:'藤原団地'},
-            {time:'14:14',dest:'藤原団地'},{time:'14:34',dest:'藤原団地'},{time:'14:54',dest:'藤原団地'},
-            {time:'15:14',dest:'藤原団地'},{time:'15:34',dest:'藤原団地'},{time:'15:54',dest:'藤原団地'},
-            {time:'16:14',dest:'藤原団地'},{time:'16:34',dest:'藤原団地'},{time:'16:54',dest:'藤原団地'},
-            {time:'17:18',dest:'藤原団地'},{time:'17:48',dest:'藤原団地'},{time:'18:18',dest:'藤原団地'},
-            {time:'18:53',dest:'藤原団地'},{time:'19:28',dest:'藤原団地'},{time:'19:58',dest:'藤原団地'},
+            {time:'07:32',dest:'藤原団地'}, {time:'08:23',dest:'藤原団地'}, {time:'08:48',dest:'藤原団地'},
+            {time:'09:14',dest:'藤原団地'}, {time:'09:36',dest:'藤原団地'}, {time:'09:56',dest:'藤原団地'},
+            {time:'10:16',dest:'藤原団地'}, {time:'10:36',dest:'藤原団地'}, {time:'10:54',dest:'藤原団地'},
+            {time:'11:14',dest:'藤原団地'}, {time:'11:34',dest:'藤原団地'}, {time:'11:54',dest:'藤原団地'},
+            {time:'12:14',dest:'藤原団地'}, {time:'12:34',dest:'藤原団地'}, {time:'12:54',dest:'藤原団地'},
+            {time:'13:14',dest:'藤原団地'}, {time:'13:34',dest:'藤原団地'}, {time:'13:54',dest:'藤原団地'},
+            {time:'14:14',dest:'藤原団地'}, {time:'14:34',dest:'藤原団地'}, {time:'14:54',dest:'藤原団地'},
+            {time:'15:14',dest:'藤原団地'}, {time:'15:34',dest:'藤原団地'}, {time:'15:54',dest:'藤原団地'},
+            {time:'16:14',dest:'藤原団地'}, {time:'16:34',dest:'藤原団地'}, {time:'16:54',dest:'藤原団地'},
+            {time:'17:18',dest:'藤原団地'}, {time:'17:48',dest:'藤原団地'}, {time:'18:18',dest:'藤原団地'},
+            {time:'18:53',dest:'藤原団地'}, {time:'19:28',dest:'藤原団地'}, {time:'19:58',dest:'藤原団地'},
             {time:'20:57',dest:'藤原団地'}
           ],
           holiday: [
-            {time:'07:32',dest:'藤原団地'},{time:'08:23',dest:'藤原団地'},{time:'08:48',dest:'藤原団地'},
-            {time:'09:14',dest:'藤原団地'},{time:'09:36',dest:'藤原団地'},{time:'09:56',dest:'藤原団地'},
-            {time:'10:16',dest:'藤原団地'},{time:'10:36',dest:'藤原団地'},{time:'10:54',dest:'藤原団地'},
-            {time:'11:14',dest:'藤原団地'},{time:'11:34',dest:'藤原団地'},{time:'11:54',dest:'藤原団地'},
-            {time:'12:14',dest:'藤原団地'},{time:'12:34',dest:'藤原団地'},{time:'12:54',dest:'藤原団地'},
-            {time:'13:14',dest:'藤原団地'},{time:'13:34',dest:'藤原団地'},{time:'13:54',dest:'藤原団地'},
-            {time:'14:14',dest:'藤原団地'},{time:'14:34',dest:'藤原団地'},{time:'14:54',dest:'藤原団地'},
-            {time:'15:14',dest:'藤原団地'},{time:'15:34',dest:'藤原団地'},{time:'15:54',dest:'藤原団地'},
-            {time:'16:14',dest:'藤原団地'},{time:'16:34',dest:'藤原団地'},{time:'16:54',dest:'藤原団地'},
-            {time:'17:18',dest:'藤原団地'},{time:'17:48',dest:'藤原団地'},{time:'18:18',dest:'藤原団地'},
-            {time:'18:53',dest:'藤原団地'},{time:'19:28',dest:'藤原団地'},{time:'19:58',dest:'藤原団地'},
+            {time:'07:32',dest:'藤原団地'}, {time:'08:23',dest:'藤原団地'}, {time:'08:48',dest:'藤原団地'},
+            {time:'09:14',dest:'藤原団地'}, {time:'09:36',dest:'藤原団地'}, {time:'09:56',dest:'藤原団地'},
+            {time:'10:16',dest:'藤原団地'}, {time:'10:36',dest:'藤原団地'}, {time:'10:54',dest:'藤原団地'},
+            {time:'11:14',dest:'藤原団地'}, {time:'11:34',dest:'藤原団地'}, {time:'11:54',dest:'藤原団地'},
+            {time:'12:14',dest:'藤原団地'}, {time:'12:34',dest:'藤原団地'}, {time:'12:54',dest:'藤原団地'},
+            {time:'13:14',dest:'藤原団地'}, {time:'13:34',dest:'藤原団地'}, {time:'13:54',dest:'藤原団地'},
+            {time:'14:14',dest:'藤原団地'}, {time:'14:34',dest:'藤原団地'}, {time:'14:54',dest:'藤原団地'},
+            {time:'15:14',dest:'藤原団地'}, {time:'15:34',dest:'藤原団地'}, {time:'15:54',dest:'藤原団地'},
+            {time:'16:14',dest:'藤原団地'}, {time:'16:34',dest:'藤原団地'}, {time:'16:54',dest:'藤原団地'},
+            {time:'17:18',dest:'藤原団地'}, {time:'17:48',dest:'藤原団地'}, {time:'18:18',dest:'藤原団地'},
+            {time:'18:53',dest:'藤原団地'}, {time:'19:28',dest:'藤原団地'}, {time:'19:58',dest:'藤原団地'},
             {time:'20:57',dest:'藤原団地'}
           ]
         }
@@ -689,111 +668,62 @@ const FALLBACK_BUS_OPS = [
     dirs:[
       {
         id:'uno-hy', name:'駅前町・表町方面', short:'表町方面',
-        times: {
-          weekday:[
-            {time:'06:45',dest:'表町BC'},{time:'07:12',dest:'表町BC'},{time:'07:38',dest:'表町BC'},
-            {time:'08:19',dest:'表町BC'},{time:'08:52',dest:'表町BC'},{time:'09:06',dest:'表町BC'},
-            {time:'09:31',dest:'表町BC'},{time:'09:50',dest:'表町BC'},{time:'10:21',dest:'表町BC'},
-            {time:'10:51',dest:'表町BC'},{time:'11:15',dest:'表町BC'},{time:'11:37',dest:'表町BC'},
-            {time:'11:57',dest:'表町BC'},{time:'12:15',dest:'表町BC'},{time:'12:35',dest:'表町BC'},
-            {time:'13:00',dest:'表町BC'},{time:'13:25',dest:'表町BC'},{time:'13:54',dest:'表町BC'},
-            {time:'14:25',dest:'表町BC'},{time:'14:45',dest:'表町BC'},{time:'15:05',dest:'表町BC'},
-            {time:'15:29',dest:'表町BC'},{time:'15:53',dest:'表町BC'},{time:'16:43',dest:'表町BC'},
-            {time:'17:11',dest:'表町BC'},{time:'18:21',dest:'表町BC'},{time:'19:13',dest:'表町BC'},
-            {time:'20:47',dest:'表町BC'}
-          ],
-          saturday:[
-            {time:'06:56',dest:'表町BC'},{time:'07:31',dest:'表町BC'},{time:'08:05',dest:'表町BC'},
-            {time:'08:29',dest:'表町BC'},{time:'08:54',dest:'表町BC'},{time:'09:25',dest:'表町BC'},
-            {time:'09:45',dest:'表町BC'},{time:'10:21',dest:'表町BC'},{time:'11:06',dest:'表町BC'},
-            {time:'11:36',dest:'表町BC'},{time:'12:21',dest:'表町BC'},{time:'13:21',dest:'表町BC'},
-            {time:'13:51',dest:'表町BC'},{time:'14:20',dest:'表町BC'},{time:'14:49',dest:'表町BC'},
-            {time:'15:10',dest:'表町BC'},{time:'15:35',dest:'表町BC'},{time:'16:15',dest:'表町BC'},
-            {time:'16:47',dest:'表町BC'},{time:'17:10',dest:'表町BC'},{time:'17:34',dest:'表町BC'},
-            {time:'18:00',dest:'表町BC'},{time:'18:30',dest:'表町BC'},{time:'19:29',dest:'表町BC'},
-            {time:'20:26',dest:'表町BC'}
-          ],
-          holiday:[
-            {time:'06:56',dest:'表町BC'},{time:'07:31',dest:'表町BC'},{time:'08:05',dest:'表町BC'},
-            {time:'08:29',dest:'表町BC'},{time:'08:54',dest:'表町BC'},{time:'09:25',dest:'表町BC'},
-            {time:'09:45',dest:'表町BC'},{time:'10:21',dest:'表町BC'},{time:'11:06',dest:'表町BC'},
-            {time:'11:36',dest:'表町BC'},{time:'12:21',dest:'表町BC'},{time:'13:21',dest:'表町BC'},
-            {time:'13:51',dest:'表町BC'},{time:'14:20',dest:'表町BC'},{time:'14:49',dest:'表町BC'},
-            {time:'15:10',dest:'表町BC'},{time:'15:35',dest:'表町BC'},{time:'16:15',dest:'表町BC'},
-            {time:'16:47',dest:'表町BC'},{time:'17:10',dest:'表町BC'},{time:'17:34',dest:'表町BC'},
-            {time:'18:00',dest:'表町BC'},{time:'18:30',dest:'表町BC'},{time:'19:29',dest:'表町BC'},
-            {time:'20:26',dest:'表町BC'}
-          ]
-        }
+        times:['07:15','07:35','07:55','08:15','08:35','08:55','09:15','09:35','09:55','10:15','10:35','10:55',
+               '11:15','11:35','11:55','12:15','12:35','12:55','13:15','13:35','13:55','14:15','14:35','14:55',
+               '15:15','15:35','15:55','16:15','16:35','16:55','17:15','17:35','17:55','18:15','18:35','18:55',
+               '19:15','19:45','20:15','20:45','21:15','21:45']
       },
       {
         id:'uno-hg', name:'東岡山方面', short:'東岡山方面',
-        times:{
-          weekday:[
-            {time:'07:46',dest:'東岡山'},{time:'08:04',dest:'東岡山'},{time:'08:35',dest:'東岡山'},
-            {time:'08:50',dest:'東岡山'},{time:'09:25',dest:'東岡山'},{time:'09:55',dest:'東岡山'},
-            {time:'10:15',dest:'東岡山'},{time:'10:30',dest:'東岡山'},{time:'10:50',dest:'東岡山'},
-            {time:'11:15',dest:'東岡山'},{time:'12:00',dest:'東岡山'},{time:'12:20',dest:'東岡山'},
-            {time:'12:45',dest:'東岡山'},{time:'13:30',dest:'東岡山'},{time:'13:50',dest:'東岡山'},
-            {time:'14:10',dest:'東岡山'},{time:'14:30',dest:'東岡山'},{time:'14:50',dest:'東岡山'},
-            {time:'15:32',dest:'東岡山'},{time:'16:07',dest:'東岡山'},{time:'17:07',dest:'東岡山'},
-            {time:'17:38',dest:'東岡山'},{time:'18:02',dest:'東岡山'},{time:'18:27',dest:'東岡山'},
-            {time:'18:57',dest:'東岡山'},{time:'19:36',dest:'東岡山'},{time:'20:14',dest:'東岡山'},
-            {time:'21:13',dest:'東岡山'}
-          ],
-          saturday:[
-            {time:'07:18',dest:'東岡山'},{time:'08:03',dest:'東岡山'},{time:'08:32',dest:'東岡山'},
-            {time:'08:50',dest:'東岡山'},{time:'09:25',dest:'東岡山'},{time:'10:10',dest:'東岡山'},
-            {time:'10:40',dest:'東岡山'},{time:'11:20',dest:'東岡山'},{time:'12:10',dest:'東岡山'},
-            {time:'12:50',dest:'東岡山'},{time:'13:15',dest:'東岡山'},{time:'13:45',dest:'東岡山'},
-            {time:'14:25',dest:'東岡山'},{time:'15:15',dest:'東岡山'},{time:'15:48',dest:'東岡山'},
-            {time:'16:10',dest:'東岡山'},{time:'16:39',dest:'東岡山'},{time:'16:56',dest:'東岡山'},
-            {time:'17:26',dest:'東岡山'},{time:'17:51',dest:'東岡山'},{time:'18:21',dest:'東岡山'},
-            {time:'18:55',dest:'東岡山'},{time:'19:30',dest:'東岡山'},{time:'20:10',dest:'東岡山'},
-            {time:'20:59',dest:'東岡山'}
-          ],
-          holiday:[
-            {time:'07:18',dest:'東岡山'},{time:'08:03',dest:'東岡山'},{time:'08:32',dest:'東岡山'},
-            {time:'08:50',dest:'東岡山'},{time:'09:25',dest:'東岡山'},{time:'10:10',dest:'東岡山'},
-            {time:'10:40',dest:'東岡山'},{time:'11:20',dest:'東岡山'},{time:'12:10',dest:'東岡山'},
-            {time:'12:50',dest:'東岡山'},{time:'13:15',dest:'東岡山'},{time:'13:45',dest:'東岡山'},
-            {time:'14:25',dest:'東岡山'},{time:'15:15',dest:'東岡山'},{time:'15:48',dest:'東岡山'},
-            {time:'16:10',dest:'東岡山'},{time:'16:39',dest:'東岡山'},{time:'16:56',dest:'東岡山'},
-            {time:'17:26',dest:'東岡山'},{time:'17:51',dest:'東岡山'},{time:'18:21',dest:'東岡山'},
-            {time:'18:55',dest:'東岡山'},{time:'19:30',dest:'東岡山'},{time:'20:10',dest:'東岡山'},
-            {time:'20:59',dest:'東岡山'}
-          ]
-        }
+        times:['07:20','07:50','08:20','08:50','09:20','09:50','10:20','10:50','11:20','11:50','12:20','12:50',
+               '13:20','13:50','14:20','14:50','15:20','15:50','16:20','16:50','17:20','17:50','18:20','18:50',
+               '19:20','19:50','20:30','21:10','21:50']
       }
     ]
   }
 ];
 
+let CURRENT_TRAIN_LINES = FALLBACK_TRAIN_LINES;
 let CURRENT_BUS_OPS = FALLBACK_BUS_OPS;
-let isBusDataOnline = false;
+let isDataOnline = false;
 
 /* ============================================================
-   GTFS/APIデータ非同期取得
+   すべての交通情報やお知らせを外部ファイルから一括取得する仕組み
    ============================================================ */
-async function fetchBusData() {
+async function fetchTransitData() {
   try {
-    const response = await fetch('bus_timetable.json');
+    // transit_data.json というファイルを読み込みに行く
+    const response = await fetch('transit_data.json'); 
     if (!response.ok) throw new Error('Network error');
+    
     const data = await response.json();
-    CURRENT_BUS_OPS = data;
-    isBusDataOnline = true;
-    document.getElementById('data-mode-badge').textContent = 'API取得中';
+    
+    // 電車のデータがあれば上書き
+    if (data.trains) { CURRENT_TRAIN_LINES = data.trains; }
+    
+    // バスのデータがあれば上書き
+    if (data.buses) { CURRENT_BUS_OPS = data.buses; }
+
+    // スクロールお知らせテキストがあれば上書き
+    if (data.ticker) {
+      document.getElementById('ticker-text').textContent = data.ticker;
+    }
+
+    isDataOnline = true;
+    document.getElementById('data-mode-badge').textContent = '外部データ取得中';
     document.getElementById('data-mode-badge').style.background = 'var(--accent)';
   } catch (error) {
+    // 失敗した場合は、フォールバック（静的データ）を利用する
+    CURRENT_TRAIN_LINES = FALLBACK_TRAIN_LINES;
     CURRENT_BUS_OPS = FALLBACK_BUS_OPS;
-    isBusDataOnline = false;
+    isDataOnline = false;
     document.getElementById('data-mode-badge').textContent = '静的データ';
     document.getElementById('data-mode-badge').style.background = 'var(--ok)';
   }
 }
 
 /* ============================================================
-   共通ユーティリティ
+   共通ユーティリティ（自動ダイヤ判定含む）
    ============================================================ */
 const now = () => new Date();
 
@@ -826,13 +756,13 @@ function nextDep(timesData, n=2) {
 }
 
 function status(min, walk) {
-  const hurry = typeof walk==='object' ? walk.hurry : walk;
-  if (min<0)              return {lbl:'諦めましょう', sc:'s-gone',       cc:'cd-gone'};
-  if (min-hurry >= 8)     return {lbl:'余裕あり',     sc:'s-ok',         cc:'cd-ok'  };
-  if (min-hurry >= 6)     return {lbl:'余裕を持って', sc:'s-care',       cc:'cd-care'};
-  if (min-hurry >= 2)     return {lbl:'まだ行けます', sc:'s-hurry',      cc:'cd-hurry'};
-  if (min-hurry >= 0)     return {lbl:'おすすめ外',   sc:'s-veryhurry',  cc:'cd-veryhurry'};
-  return                         {lbl:'厳しい...',    sc:'s-tight',      cc:'cd-tight'};
+  const hurry  = typeof walk==='object' ? walk.hurry  : walk;
+  if (min<0)              return {lbl:'諦めましょう',    sc:'s-gone',  cc:'cd-gone'};
+  if (min-hurry >= 8)     return {lbl:'余裕あり',  sc:'s-ok',    cc:'cd-ok'  };
+  if (min-hurry >= 6)     return {lbl:'余裕を持って行こう',  sc:'s-ok',    cc:'cd-hurry'  };
+  if (min-hurry >= 2)     return {lbl:'まだ行けます',  sc:'s-ok',    cc:'cd-hurry'  };
+  if (min-hurry >= 0)     return {lbl:'おすすめはしません',  sc:'s-hurry', cc:'cd-veryhurry'};
+  return                         {lbl:'厳しい...',    sc:'s-tight', cc:'cd-gone'};
 }
 
 const fmtMin = m => m<0?'発車済':m<1?'間もなく':`${Math.floor(m)}分`;
@@ -842,9 +772,10 @@ function depRow(dep, def, walk, key, i) {
   const s   = status(dep.min, walk);
   const lbl = dep.dest ? `${dep.dest} 行き` : def;
   const hurry = typeof walk==='object' ? walk.hurry : walk;
+  
   const margin = dep.min - hurry;
-  const bl = (margin >= 0 && margin < 8) ? ' blink' : '';
-
+  const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+  
   return `
     <div class="d-row">
       <div class="d-info">
@@ -864,7 +795,7 @@ function depRow(dep, def, walk, key, i) {
 function buildTrain() {
   const g = document.getElementById('train-grid');
   g.innerHTML = '';
-  TRAIN_LINES.forEach(line => {
+  CURRENT_TRAIN_LINES.forEach(line => {
     const limit = line.limit || 2;
     const nexts = nextDep(line.times, limit);
     let rows = '<div class="d-list">';
@@ -874,7 +805,7 @@ function buildTrain() {
       nexts.forEach((d,i) => { rows += depRow(d, line.def, WALK.train, `tr-${line.id}`, i); });
     }
     rows += '</div>';
-
+    
     let badgesHtml = '';
     if (line.badges) {
       line.badges.forEach(b => {
@@ -882,12 +813,19 @@ function buildTrain() {
       });
     }
 
+    // グループ名ラベルがある場合は描画
+    let groupHtml = '';
+    if (line.groupLabel) {
+      groupHtml = `<div class="r-group"><span class="r-group-label">${line.groupLabel}</span></div>`;
+    }
+
     const c = document.createElement('div');
     c.className = 'r-card';
     c.id = `tr-${line.id}`;
     if (line.spanRow) c.style.gridRow = `span ${line.spanRow}`;
-
+    
     c.innerHTML = `
+      ${groupHtml}
       <div class="r-head">
         <div style="display:flex; gap:4px;">${badgesHtml}</div>
         <div class="r-name">${line.name}</div>
@@ -902,7 +840,7 @@ function buildBus() {
   CURRENT_BUS_OPS.forEach(op => {
     const wrapper = document.createElement('div');
     wrapper.className = 'col-section';
-
+    
     const dirsHtml = op.dirs.map(dir => {
       const nexts = nextDep(dir.times, 2);
       let rows = '';
@@ -913,7 +851,7 @@ function buildBus() {
       }
       return `<div class="op-dir"><div class="op-dir-hd">${dir.name}</div>${rows}</div>`;
     }).join('');
-
+    
     wrapper.innerHTML = `
       <div class="sec-title-row">
         <span class="sec-title">${op.name}</span>
@@ -922,7 +860,7 @@ function buildBus() {
       <div class="op-block" id="bs-${op.id}">
         <div class="op-dirs">${dirsHtml}</div>
       </div>`;
-
+    
     sec.appendChild(wrapper);
   });
 }
@@ -931,15 +869,17 @@ function buildBus() {
    カウントダウン更新（10秒）
    ============================================================ */
 function updateCD() {
-  TRAIN_LINES.forEach(line => {
+  CURRENT_TRAIN_LINES.forEach(line => {
     const limit = line.limit || 2;
     nextDep(line.times, limit).forEach((d,i) => {
       const cd=document.getElementById(`tr-${line.id}-cd-${i}`);
       const bd=document.getElementById(`tr-${line.id}-bd-${i}`);
       if(!cd||!bd) return;
       const s=status(d.min,WALK.train);
+      
       const margin = d.min - WALK.train.hurry;
       const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+      
       cd.textContent=fmtMin(d.min); cd.className=`d-cd ${s.cc}${bl}`;
       bd.textContent=s.lbl;          bd.className=`d-badge ${s.sc}`;
     });
@@ -951,9 +891,11 @@ function updateCD() {
         const bd=document.getElementById(`bs-${dir.id}-bd-${i}`);
         if(!cd||!bd) return;
         const s=status(d.min,op.walk);
+        
         const hurry = typeof op.walk==='object' ? op.walk.hurry : op.walk;
         const margin = d.min - hurry;
         const bl = (margin >= 0 && margin < 6) ? ' blink' : '';
+        
         cd.textContent=fmtMin(d.min); cd.className=`d-cd ${s.cc}${bl}`;
         bd.textContent=s.lbl;          bd.className=`d-badge ${s.sc}`;
       });
@@ -962,13 +904,14 @@ function updateCD() {
 }
 
 /* ============================================================
-   時計・バッジ更新
+   時計とカレンダー・バッジ更新
    ============================================================ */
 function updateClock() {
   const n=now(), p=x=>String(x).padStart(2,'0');
   document.getElementById('clock').textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
   const w=['日','月','火','水','木','金','土'];
   document.getElementById('hdr-date').textContent=`${n.getFullYear()}年${n.getMonth()+1}月${n.getDate()}日（${w[n.getDay()]}）`;
+
   const schedMap = { 'weekday': '平日ダイヤ', 'saturday': '土曜ダイヤ', 'holiday': '休日ダイヤ' };
   document.getElementById('sched-badge').textContent = schedMap[getScheduleType(n)];
 }
@@ -977,7 +920,7 @@ function updateClock() {
    フル更新（1分）
    ============================================================ */
 async function fullUpdate() {
-  await fetchBusData();
+  await fetchTransitData();
   buildTrain(); buildBus();
   const n=now(), p=x=>String(x).padStart(2,'0');
   document.getElementById('update-time-badge').textContent=`・更新 ${p(n.getHours())}:${p(n.getMinutes())}`;
